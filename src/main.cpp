@@ -1,9 +1,22 @@
-
+/*
+ * Copyright (C) 2019  andrewerner <andre.werner-w2m@ruhr-uni-bochum.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include <iostream>
 #include <cstdlib>
-#include <unordered_map>
-#include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
+#include "../header/assembler.h"
 
 /**
 * \brief ...
@@ -14,7 +27,10 @@
 */
 int main(int argc, char **argv) {
     namespace po = boost::program_options;
+    //!< \brief Abbreviation for boost program option library.
     namespace fs = boost::filesystem;
+    //!< \brief Abbreviation for boost file system library.
+    
     
     /* Define command line options for cmd-tool.
        help: Shows cmd-tool options
@@ -67,7 +83,7 @@ int main(int argc, char **argv) {
     /* Create file system path variable to validate configuration file.*/
     fs::path configPtr{vm["config"].as<std::string>().c_str()};
     //!< \brief Handle path to configuration file.
-    std::unordered_map<std::string, std::string> configOptions;
+    as::configMap_type_t configOptions;
     //!< \brief Store options from configuration file for further usage. 
     if(!fs::exists(configPtr))
     {
