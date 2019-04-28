@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 project(cgra_assembler)
 
 #Bring the headers from project include folder and systemc include dir to project
-#include_directories(header "$ENV{SYSTEMC_ROOT}/include")
+include_directories(header "$./header")
 
 #However, the file(GLOB...) allows for wildcard additions:
 file(GLOB SOURCES LIST_DIRECTORIES FALSE "src/*.cpp")
@@ -11,6 +11,7 @@ file(GLOB SOURCES LIST_DIRECTORIES FALSE "src/*.cpp")
 find_library(PO boost_program_options)
 find_library(FS boost_filesystem)
 find_library(SY boost_system)
+find_library(RE boost_regex)
 
 #Create project executable and link SystemC library 
 #add_executable(cgra_systemc ${SOURCES})
@@ -29,6 +30,6 @@ find_library(SY boost_system)
 #)
 
 add_executable(cgra_assembler ${SOURCES})
-target_link_libraries(cgra_assembler ${PO} ${FS} ${SY})
+target_link_libraries(cgra_assembler ${PO} ${FS} ${SY} ${RE})
 
 #install(TARGETS cgra_assembler RUNTIME DESTINATION bin)
