@@ -22,7 +22,10 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
-
+#include <string>
+#include <vector>
+#include <utility>
+#include <cstdint>
 
 /**
 * \namespace as
@@ -38,6 +41,37 @@ namespace po = boost::program_options;
 
 typedef std::unordered_map<std::string, std::string> configMap_type_t;
 //!< \brief Type definition for options from configuration file.
+
+/**
+* \struct ParseObject
+* 
+* \brief Store information of parsed assembler file line
+* 
+* \details
+* #TODO: Add description.
+* 
+*/
+struct ParseObject {
+    uint16_t fileLine{0};
+    //!< \brief Line in assembler file where the command is parsed
+    std::string cmd;
+    //!< \brief Assembler command
+    uint16_t addr{0};
+    //!< \brief Shared memory address
+    uint8_t cacheLine{0};
+    //!< \brief Cache line of target cache
+    uint8_t place{0};
+    //!< \brief Place in selected cache line
+    enum CODE_TYPE : uint8_t {
+        UNKNOWN,    //!< \brief Unknown code type
+        NO_OP,      //!< \brief Operation with no operator
+        ONE_OP,     //!< \brief Operation with one operator
+        TWO_OP,     //!< \brief Operation with two operator
+        THREE_OP    //!< \brief Operation with three operator
+    } codeType{UNKNOWN};
+    //!< \brief Code type of assembler operation
+};
+
 
 /**
 * \class Assembler
@@ -96,6 +130,10 @@ private:
     //!< \brief Output file name from configuration file.
     std::ostream& m_log;
     //!< \brief Logging string stream (default=std::cout)
+    std::vector<ParseObject> m_fileContent;
+    //!< \brief Assembler file content without comments.
+    std::string m_mc{""};
+    //!< \brief Machine code string which should be written to outfile.
     
     //Forbidden Constructor
     Assembler& operator=(const Assembler& src) = delete;
