@@ -35,8 +35,7 @@ int main ( int argc, char **argv )
     //!< \brief Abbreviation for boost program option library.
     namespace fs = boost::filesystem;
     //!< \brief Abbreviation for boost file system library.
-
-
+    
     /* Define command line options for cmd-tool.
        help: Shows cmd-tool options
        file: Path to assembler file which shall be processed.
@@ -44,9 +43,10 @@ int main ( int argc, char **argv )
      */
     po::options_description desc ( "Usable options" );
     desc.add_options()
-    ( "help,h", "Show command line options and usability." )
-    ( "file,f", po::value<std::string>()->required(), "File path to assembler file." )
-    ( "config,c", po::value<std::string>()->default_value ( "./config.cfg" ), "Assembler configuration file." );
+    ( "help,", "Show command line options and usability." )
+    ( "file,", po::value<std::string>()->required(), "File path to assembler file." )
+    ( "config,", po::value<std::string>()->default_value ( "./config.cfg" ), "Assembler configuration file." )
+    ( "log,", po::value<std::string>(), "Log file path.");
 
     /* Parse cmd-line arguments and store them in variables map.*/
     po::variables_map vm;
@@ -60,6 +60,20 @@ int main ( int argc, char **argv )
         return EXIT_SUCCESS;
     }
 
+    if(vm.count("log"))
+    {
+        /* Create file system path variable for log file.*/
+        fs::path logPtr {vm["log"].as<std::string>().c_str() };
+        //!< \brief Handle path to assembler file.
+        if ( !fs::exists ( logPtr ) )
+        {
+            if(logPtr.parent_path().string() != ".")
+                fs::create_directories(logPtr.parent_path());
+        }
+        else
+            std::cout << "Warning: Logfile exists and will be overwritten." << std::endl;
+    }
+    
     /* Create file system path variable to validate assembler input file.*/
     fs::path filePtr {vm["file"].as<std::string>().c_str() };
     //!< \brief Handle path to assembler file.
@@ -115,12 +129,42 @@ int main ( int argc, char **argv )
     
     try
     {
-        as::Assembler myAs(filePtr, configOptions);
-        myAs.parse();
+        //Run assembler with log file
+        if(vm.count("log"))
+        {
+            
+            /* Create file system path variable for log file.*/
+            fs::path logPtr {vm["log"].as<std::string>().c_str() };
+            
+            std::filebuf fb;
+            if(fb.open(logPtr.c_str(), std::ios::out))
+            {
+                std::ostream log_os(&fb);
+                as::Assembler myAs(filePtr, configOptions, log_os);
+                myAs.parse();
+                myAs.assemble();
+                myAs.writeVmcFile();
+                fb.close();
+            }
+        }
+        else //Run assembler with printing on std cout. 
+        {
+            as::Assembler myAs(filePtr, configOptions);
+            myAs.parse();
+            myAs.assemble();
+            myAs.writeVmcFile();
+        }
     }
     catch(const as::AssemblerException& ce)
     {
         std::cout << ce.what() << std::endl;
+        return EXIT_FAILURE;
     }
+    catch(const std::exception& e)
+    {
+        std::cout << "Std. error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+    
     return EXIT_SUCCESS;
 }
