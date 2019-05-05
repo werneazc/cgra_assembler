@@ -13,9 +13,6 @@ find_library(FS boost_filesystem)
 find_library(SY boost_system)
 find_library(RE boost_regex)
 
-#Create project executable and link SystemC library 
-#add_executable(cgra_systemc ${SOURCES})
-
 #find_package(Doxygen)
 #set(DOXFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/cgra-systemc)
 # set(DOXFILE ${CMAKE_CURRENT_BINARY_DIR}/cgra_systemc)
