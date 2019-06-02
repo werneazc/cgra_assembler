@@ -1,2 +1,4 @@
 build/**
 !build/config.cfg
+doc/**
+!doc/cgra-assembler

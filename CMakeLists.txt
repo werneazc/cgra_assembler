@@ -13,18 +13,18 @@ find_library(FS boost_filesystem)
 find_library(SY boost_system)
 find_library(RE boost_regex)
 
-#find_package(Doxygen)
-#set(DOXFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/cgra-systemc)
-# set(DOXFILE ${CMAKE_CURRENT_BINARY_DIR}/cgra_systemc)
-# configure_file(${DOXFILE_IN} ${DOXFILE} @ONLY)
+find_package(Doxygen)
+set(DOXFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/cgra-assembler)
+set(DOXFILE ${CMAKE_CURRENT_BINARY_DIR}/cgra_assembler)
+configure_file(${DOXFILE_IN} ${DOXFILE} @ONLY)
 
-#add_custom_target(
-#doc ALL
-#COMMAND ${DOXYGEN_EXECUTABLE} ${DOXFILE_IN}
-#WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
-#COMMENT "Generating doxygen documentation"
-#VERBATIM
-#)
+add_custom_target(
+doc ALL
+COMMAND ${DOXYGEN_EXECUTABLE} ${DOXFILE_IN}
+WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
+COMMENT "Generating doxygen documentation"
+VERBATIM
+)
 
 add_executable(cgra_assembler ${SOURCES})
 target_link_libraries(cgra_assembler ${PO} ${FS} ${SY} ${RE})
