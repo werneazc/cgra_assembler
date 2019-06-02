@@ -25,7 +25,7 @@
 namespace as {
     
 /**
-* \class ConfigException
+* \class AssemblerException
 * 
 * \brief Exception handler for configuration file failures.
 * 
