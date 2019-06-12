@@ -76,6 +76,15 @@ public:
     */
     virtual ~Level();
     
+    /**
+    * @brief Compare to levels
+    * 
+    * @param lhsA left hand side
+    * @param rhsA right hand side
+    * @return true is member variables are identically
+    */
+    friend bool operator==(const Level& lhsA, const Level& rhsA);
+    
     //Actions with parsed objects
     /**
     * @brief Add parse object to current level.
@@ -112,8 +121,8 @@ public:
     /**
     * @brief Add parse object to current level.
     * 
-    * @param[in] lvlA lvlA: Level where the parsed object should be added
-    * @param[in] parseObjA parseObjA: Parsed object to add.
+    * @param[in] lvlA Level where the parsed object should be added
+    * @param[in] parseObjA Parsed object to add.
     * @return as::Level& Level where the parsed object currently added.
     */
     friend Level& operator<<(Level& lvlA, ParseObjBase* parseObjA);
@@ -169,6 +178,7 @@ private:
     static Level* activeLvl;
     //!< @brief Currently active level for adding new parsed objects.
 };
+
 
 } /* End namespace as */
 

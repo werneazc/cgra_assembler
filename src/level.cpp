@@ -16,16 +16,17 @@
  */
 
 #include <stdexcept>
+#include <algorithm>
 #include "level.h"
 #include "../header/myException.h"
 #include "../header/parseobjectvariable.h"
 
-as::Level& operator<<(as::Level& lelA, as::ParseObjBase* parseObjA)
+as::Level& operator<<(as::Level& lvlA, as::ParseObjBase* parseObjA)
 {
-    if(lelA.addParseObj(parseObjA))
+    if(lvlA.addParseObj(parseObjA))
         throw as::AssemblerException("Error while adding parse object to current level.", 4000);
     
-    return lelA;
+    return lvlA;
 }
 
 namespace as {
@@ -189,6 +190,43 @@ void Level::leave(void)
 {
     Level::setCurrentLevel(m_parentLvl);
     return;
+}
+
+bool operator==(const Level& lhsA, const Level& rhsA)
+{
+    //same object
+    if(&lhsA == &rhsA)
+        return true;
+    
+    //Compare parent level member
+    if(lhsA.m_parentLvl != rhsA.m_parentLvl)
+        return false;
+    
+    //Compare child level entries
+    if(lhsA.m_childLvlVec.size() != rhsA.m_childLvlVec.size())
+        return false;
+    else
+    {
+        auto t_res = std::equal(lhsA.m_childLvlVec.begin(), 
+            lhsA.m_childLvlVec.end(), rhsA.m_childLvlVec.begin());
+        
+        if(!t_res)
+            return false;
+    }    
+        
+    if(lhsA.m_parsedObjVec.size() != rhsA.m_parsedObjVec.size())
+        return false;
+    else
+    {
+        
+        auto t_res = std::equal(lhsA.m_parsedObjVec.begin(),
+            lhsA.m_parsedObjVec.end(), rhsA.m_parsedObjVec.begin());
+        
+        if(!t_res)
+            return t_res;
+    }
+    
+    return true;
 }
 
 } /* End namespace as */
