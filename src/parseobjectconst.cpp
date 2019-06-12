@@ -40,7 +40,7 @@ ParseObjectConst::ParseObjectConst(ParseObjectConst&& srcA) :
 ParseObjectConst& ParseObjectConst::operator=(const ParseObjectConst& srcA)
 {
     
-    *(dynamic_cast<ParseObjBase*>(this)) = dynamic_cast<const ParseObjBase&>(srcA);
+    *(static_cast<ParseObjBase*>(this)) = static_cast<const ParseObjBase&>(srcA);
     this->m_value = srcA.getConstValue();
     
     return *this;
@@ -51,7 +51,7 @@ ParseObjectConst& ParseObjectConst::operator=(ParseObjectConst&& srcA)
 {
     
     
-    *(dynamic_cast<ParseObjBase*>(this)) = std::move(dynamic_cast<ParseObjBase&>(srcA));
+    *(static_cast<ParseObjBase*>(this)) = std::move(static_cast<ParseObjBase&>(srcA));
     this->m_value = srcA.getConstValue();
     
     srcA.clearMembers();
@@ -61,7 +61,7 @@ ParseObjectConst& ParseObjectConst::operator=(ParseObjectConst&& srcA)
 
 void ParseObjectConst::clearMembers(void)
 {
-    dynamic_cast<ParseObjBase*>(this)->clearMembers();
+    static_cast<ParseObjBase*>(this)->clearMembers();
     m_value = INT32_MAX;
 }
 

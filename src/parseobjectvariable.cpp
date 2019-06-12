@@ -37,7 +37,7 @@ ParseObjectVariable& ParseObjectVariable::operator=(const ParseObjectVariable& s
 {
     ParseObjBase t_pObj{src.getLevel(), src.getCommandClass(), src.getReadCmdLine(), src.getFileLineNumber()};
     
-    *(dynamic_cast<ParseObjBase*>(this)) = std::move(t_pObj);
+    *(static_cast<ParseObjBase*>(this)) = std::move(t_pObj);
     
     m_name = src.m_name;
     m_value = src.m_value;
@@ -62,7 +62,7 @@ ParseObjectVariable& ParseObjectVariable::operator=(ParseObjectVariable&& src)
     
     ParseObjBase t_pObj{src.getLevel(), src.getCommandClass(), src.getReadCmdLine(), src.getFileLineNumber()};
     
-    *(dynamic_cast<ParseObjBase*>(this)) = std::move(t_pObj);
+    *(static_cast<ParseObjBase*>(this)) = std::move(t_pObj);
     
     m_name = src.m_name;
     m_value = src.m_value;
@@ -89,7 +89,7 @@ void ParseObjectVariable::setVariableValue(const int32_t valueA)
 
 void ParseObjectVariable::clearMembers()
 {
-    dynamic_cast<ParseObjBase*>(this)->clearMembers();
+    static_cast<ParseObjBase*>(this)->clearMembers();
     m_name.clear();
     m_value = 0;
     

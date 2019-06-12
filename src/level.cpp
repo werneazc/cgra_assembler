@@ -169,7 +169,7 @@ ParseObjBase* Level::findParseObj(const std::string& nameA)
     {
         if(parseObj->getCommandClass() == COMMANDCLASS::VARIABLE)
         {
-            if(*(dynamic_cast<ParseObjectVariable*>(parseObj)) == nameA)
+            if(*(static_cast<ParseObjectVariable*>(parseObj)) == nameA)
             {
                 t_parseObj=parseObj;
                 break;
