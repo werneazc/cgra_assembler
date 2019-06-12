@@ -123,7 +123,7 @@ private:
 * @param nameA Name as a string to compare with parsed object name.
 * @return If search name and name of parsed object identically return true, else return fail.
 */
-bool operator==(ParseObjectVariable& lhsA, const std::string& nameA);
+bool operator==(const ParseObjectVariable& lhsA, const std::string& nameA);
 
 } /* End namespace as */
 
