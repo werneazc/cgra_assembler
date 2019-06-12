@@ -25,11 +25,22 @@
 namespace as {
     
 
+/**
+* @class Loop
+* 
+* @brief Special level for the usability of loops in assembler files.
+* 
+* @details 
+* Loops store their internal parsed objects as a new level instance.
+*/
 class Loop : public Level
 {
 public:
     /**
     * @brief General constructor
+    * 
+    * @throws AssemblerException if stepwith is zero or if range conditions are wrong.
+    * 
     * 
     * @param[in] parentLvlA Ptr. to parent level of Loop.
     * @param[in] fileLineA File line number of assembler file.

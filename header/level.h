@@ -121,6 +121,8 @@ public:
     /**
     * @brief Add parse object to current level.
     * 
+    * @throws AssemblerException if adding to parsed object failed.
+    * 
     * @param[in] lvlA Level where the parsed object should be added
     * @param[in] parseObjA Parsed object to add.
     * @return as::Level& Level where the parsed object currently added.

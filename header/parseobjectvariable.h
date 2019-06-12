@@ -26,6 +26,12 @@ class Level;
 
 namespace as {
     
+/**
+* @class ParseObjectVariable
+* 
+* @brief Parse object variable from assembler command file.
+* 
+*/
 class ParseObjectVariable : public as::ParseObjBase {
 public:
     
