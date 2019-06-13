@@ -40,22 +40,22 @@ Add::Add(Add&& srcA) :
     return; 
 }
 
-Add& Add::operator=(const Add& lhsA)
+Add& Add::operator=(const Add& rhsA)
 {
-    *(static_cast<ParseObjBase*>(this)) = static_cast<const ParseObjBase&>(lhsA);
-    this->setFirst(lhsA.getFirst());
-    this->setSecond(lhsA.getSecond());
+    *(static_cast<ParseObjBase*>(this)) = static_cast<const ParseObjBase&>(rhsA);
+    this->setFirst(rhsA.getFirst());
+    this->setSecond(rhsA.getSecond());
     
     return *this;
 }
 
-Add& Add::operator=(Add&& lhsA)
+Add& Add::operator=(Add&& rhsA)
 {
-    *(static_cast<ParseObjBase*>(this)) = std::move(static_cast<ParseObjBase&>(lhsA));
-    this->setFirst(lhsA.getFirst());
-    this->setSecond(lhsA.getSecond());
+    *(static_cast<ParseObjBase*>(this)) = std::move(static_cast<ParseObjBase&>(rhsA));
+    this->setFirst(rhsA.getFirst());
+    this->setSecond(rhsA.getSecond());
     
-    lhsA.clearMembers();
+    rhsA.clearMembers();
     
     return *this;
 }

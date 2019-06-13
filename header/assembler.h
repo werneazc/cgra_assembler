@@ -48,7 +48,7 @@ typedef std::unordered_map<std::string, std::string> configMap_type_t;
 * \brief Store information of parsed assembler file line
 * 
 * \details
-* #TODO: Add description.
+* 
 * 
 */
 struct ParseObject {

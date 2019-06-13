@@ -41,23 +41,23 @@ AddInteger::AddInteger(AddInteger&& srcA) : IArithmetic{srcA.getFirst(), srcA.ge
     return;
 }
 
-AddInteger& AddInteger::operator=(const AddInteger& lhsA)
+AddInteger& AddInteger::operator=(const AddInteger& rhsA)
 {
-    *(static_cast<ParseObjBase*>(this)) = static_cast<const ParseObjBase&>(lhsA);
-    this->setFirst(lhsA.getFirst());
-    this->setSecond(lhsA.getSecond());
+    *(static_cast<ParseObjBase*>(this)) = static_cast<const ParseObjBase&>(rhsA);
+    this->setFirst(rhsA.getFirst());
+    this->setSecond(rhsA.getSecond());
     
     return *this;
 }
 
-AddInteger& AddInteger::operator=(AddInteger&& lhsA)
+AddInteger& AddInteger::operator=(AddInteger&& rhsA)
 {
     
-    *(static_cast<ParseObjBase*>(this)) = std::move(static_cast<ParseObjBase&>(lhsA));
-    this->setFirst(lhsA.getFirst());
-    this->setSecond(lhsA.getSecond());
+    *(static_cast<ParseObjBase*>(this)) = std::move(static_cast<ParseObjBase&>(rhsA));
+    this->setFirst(rhsA.getFirst());
+    this->setSecond(rhsA.getSecond());
     
-    lhsA.clearMembers();
+    rhsA.clearMembers();
     
     return *this;
 }

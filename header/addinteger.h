@@ -55,10 +55,10 @@ public:
     /**
     * @brief Copy assignment
     * 
-    * @param lhsA Source for new object. Members of source are deleted.
+    * @param rhsA Source for new object. Members of source are deleted.
     * @return New parsed object
     */
-    AddInteger& operator=(const AddInteger& lhsA);
+    AddInteger& operator=(const AddInteger& rhsA);
     
     /**
     * @brief Move constructor
@@ -70,10 +70,10 @@ public:
     /**
     * @brief Move assignment
     * 
-    * @param lhsA Members of lhsA are deleted after copying.
-    * @return Object containing values of lhsA.
+    * @param rhsA Members of lhsA are deleted after copying.
+    * @return Object containing values of rhsA.
     */
-    AddInteger& operator=(AddInteger&& lhsA);
+    AddInteger& operator=(AddInteger&& rhsA);
     
     
     /**

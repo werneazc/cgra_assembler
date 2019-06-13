@@ -62,18 +62,18 @@ public:
     /**
     * @brief Copy assignment
     * 
-    * @param lhsA Source for assignment to new object.
-    * @return Object with values of lhsA.
+    * @param rhsA Source for assignment to new object.
+    * @return Object with values of rhsA.
     */
-    Add& operator=(const Add& lhsA);
+    Add& operator=(const Add& rhsA);
     
     /**
     * @brief Move assignment
     * 
-    * @param lhsA Source for assignment of member variables. Members of lhs are deleted.
-    * @return Object with values of lhsA.
+    * @param rhsA Source for assignment of member variables. Members of lhs are deleted.
+    * @return Object with values of rhsA.
     */
-    Add& operator=(Add&& lhsA);
+    Add& operator=(Add&& rhsA);
     
     /**
     * @brief Destructor
