@@ -22,6 +22,8 @@
 
 namespace as {
     
+//Forward declaration
+class Assembler;
 
 /**
 * @interface IAssemble
@@ -34,18 +36,11 @@ public:
     /**
     * @brief Interface function to implement assemble functionality.
     * 
+    * @param asA Assembler object containing VCGRA configuration parameter
+    * 
     * @return std::string VCGRA machine code string.
     */
-    virtual std::string assemble(void) = 0;
-    
-private:
-    
-    //Forbidden constructors
-    IAssemble() = delete;
-    IAssemble(const IAssemble& src) = delete;
-    IAssemble(IAssemble&& src) = delete;
-    IAssemble& operator=(const IAssemble& src) = delete;
-    IAssemble& operator=(IAssemble&& src) = delete;
+    virtual std::string assemble(const Assembler& asA) = 0;
 };
 
 } /*End namespace as */
