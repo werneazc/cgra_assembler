@@ -20,6 +20,7 @@
 
 #include <cstdint>
 #include "parseobjbase.h"
+#include "iassemble.h"
 
 namespace as
 {
@@ -38,7 +39,7 @@ class Level;
 * Operands of this kind generate machine codes for VCGRA. Examples are START,
 * WAIT_RAIDY or FINISH. The IDs for machine code are stored in private Member.
 */
-class NoOperand : public ParseObjBase
+class NoOperand : public ParseObjBase, public IAssemble
 {
 public:
     /**
@@ -106,6 +107,14 @@ public:
     * @return Former machine code ID.
     */
     uint32_t setMachineCodeId(const uint32_t machineIdA);
+    
+    /**
+    * @brief Create machine code from assembler command.
+    * 
+    * @param asA Assembler object containing VCGRA configuration parameter
+    * @return Machine code line for VCGRA instance.
+    */
+    virtual std::string assemble(const Assembler& asA) override final;
     
 private:
     //Forbidden constructor
