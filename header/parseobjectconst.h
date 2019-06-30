@@ -28,7 +28,7 @@ namespace as {
 * 
 * @brief Parsed object o a constant value in assembler file.
 */
-class ParseObjectConst :  as::ParseObjBase
+class ParseObjectConst : public as::ParseObjBase
 {
 public:
     
