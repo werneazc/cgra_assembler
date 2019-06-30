@@ -19,11 +19,11 @@
 #define IASSEMBLE_H
 
 #include <string>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/format.hpp>
 
 namespace as {
     
-//Forward declaration
-class Assembler;
 
 /**
 * @interface IAssemble
@@ -40,7 +40,12 @@ public:
     * 
     * @return std::string VCGRA machine code string.
     */
-    virtual std::string assemble(const Assembler& asA) = 0;
+    virtual std::string assemble(const boost::property_tree::ptree& ptreeA) = 0;
+
+
+    //Member variables:
+    boost::format m_fmtStr{"0x%1$04X%2$04X"};
+    //!< @brief Format string for machine code format.
 };
 
 } /*End namespace as */
