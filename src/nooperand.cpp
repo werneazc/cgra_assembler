@@ -18,7 +18,6 @@
 #include <utility>
 #include <sstream>
 #include "nooperand.h"
-#include "assembler.h"
 
 as::NoOperand::NoOperand(as::Level *const lvlA, const std::string& cmdLineA,
                          const uint32_t lineNumberA, const uint32_t machineIdA) :
@@ -82,9 +81,12 @@ uint32_t as::NoOperand::setMachineCodeId(const uint32_t machineIdA)
     return t_val;
 }
 
-std::string as::NoOperand::assemble(const Assembler& asA)
+std::string as::NoOperand::assemble(const boost::property_tree::ptree& ptreeA)
 {
+    //Temporary variables
     std::ostringstream t_os{""};
+    
+    t_os << "\"" << m_fmtStr % 0u % this->getMachineCodeId() << "\"";
     
     return t_os.str();
 }

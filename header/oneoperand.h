@@ -112,10 +112,10 @@ public:
     /**
     * @brief Create machine code from assembler command.
     * 
-    * @param asA Assembler object containing VCGRA configuration parameter
+    * @param ptreeA Property tree with configuration values from SW configuration file
     * @return Machine code line for VCGRA instance.
     */
-    virtual std::string assemble(const Assembler& asA) override final;
+    virtual std::string assemble(const boost::property_tree::ptree& ptreeA) override final;
     
 private:
     //Forbidden constructors

@@ -16,7 +16,12 @@
  */
 
 #include <utility>
+#include <sstream>
+#include <boost/tokenizer.hpp>
+#include "myException.h"
 #include "oneoperand.h"
+#include "parseobjectconst.h"
+#include "parseobjectvariable.h"
 
 as::OneOperand::OneOperand(Level* const lvlA, const std::string& cmdLineA,
     const uint32_t lineNumberA, ParseObjBase* const firstA, const uint32_t machineIdA) :
@@ -76,6 +81,73 @@ void as::OneOperand::clearMembers(void)
     m_machnineCodeID = UINT32_MAX;
     
     return;
+}
+
+std::string as::OneOperand::assemble(const boost::property_tree::ptree& ptreeA)
+{
+    //Tempoarary variables
+    std::ostringstream t_os{""}; //Formated machine code command
+    auto t_OpcodeSize = ptreeA.get<uint32_t>("Assembler_Property.OpCodeSize"); //Opcode size in machine code signal
+    auto t_PlaceSize = ptreeA.get<uint32_t>("Assembler_Property.PlaceSize"); //Places size in machine code signal
+    uint32_t t_numOfAvailableLines{0}; //Number of available cache lines for range check of argument of command
+    uint32_t t_countVal{0}; //Counter to select write property for available cache lines
+    uint32_t t_val{0}; //Parameter value of command
+    
+    /*#TODO: This separates the values of configuration file parameter "OneOperator" is a list.
+     * It seems, that the ordering of the values depends on the order in the configuration file.
+     * Thus, reading out the write properties for cache line size needs to be updated for an independent order.
+     */
+    auto t_opt = boost::tokenizer<boost::escaped_list_separator<char>>(ptreeA.get<std::string>("Assembler_Property.OneOperator"));
+    
+    //Search for parameter of available cache lines for actual command
+    for(const auto& opt : t_opt)
+        {
+            if(ptreeA.get<uint32_t>(opt) == m_machnineCodeID)
+            {
+                switch(t_countVal)
+                {
+                    case 0:
+                        t_numOfAvailableLines = ptreeA.get<uint32_t>("VCGRA_Property.Num_Dic_Lines");
+                        break;
+                    case 1:
+                        t_numOfAvailableLines = ptreeA.get<uint32_t>("VCGRA_Property.Num_Doc_Lines");
+                        break;
+                    case 2:
+                        t_numOfAvailableLines = ptreeA.get<uint32_t>("VCGRA_Property.Num_PC_Lines");
+                        break;
+                    case 3:
+                        t_numOfAvailableLines = ptreeA.get<uint32_t>("VCGRA_Property.Num_CC_Lines");
+                        break;
+                    default:
+                        throw as::AssemblerException("Unknown one-operation-command. Cannot select number of cache lines.", 8612);
+                        break;
+                }
+                break;
+            }
+            else
+                ++t_countVal;
+                
+        }
+    
+    if(m_first->getCommandClass() == as::COMMANDCLASS::CONSTANT)
+            t_val = static_cast<as::ParseObjectConst*>(this->m_first)->getConstValue();
+    else if(m_first->getCommandClass() == as::COMMANDCLASS::VARIABLE)
+            t_val = static_cast<as::ParseObjectVariable*>(this->m_first)->getVariableValue();
+    else
+        throw as::AssemblerException("Wrong parameter format for one-operation-command.\n \
+        Expected constant integer value or integer variable", 8613);
+    
+    if(t_val <= t_numOfAvailableLines)
+    {
+        t_val <<= (t_OpcodeSize + t_PlaceSize);
+        t_val |= m_machnineCodeID;
+    }
+    else
+        throw as::AssemblerException("Selected cache line is not available.", 8614);
+    
+    t_os << "\"" << m_fmtStr % 0u % t_val << "\"";
+    
+    return t_os.str();
 }
 
 
