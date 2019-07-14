@@ -89,7 +89,7 @@ void ParseObjectVariable::setVariableValue(const int32_t valueA)
 
 void ParseObjectVariable::clearMembers()
 {
-    static_cast<ParseObjBase*>(this)->clearMembers();
+    ParseObjBase::clearMembers();
     m_name.clear();
     m_value = 0;
     
