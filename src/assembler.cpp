@@ -15,115 +15,95 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+#include <cstdint>
+#include <locale>
 #include <boost/regex.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/format.hpp>
-#include <iostream>
-#include <cstdint>
-#include "../header/assembler.h"
-#include "../header/myException.h"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/exceptions.hpp>
+#include "assembler.h"
+#include "loop.h"
+#include "myException.h"
+#include "parseobjectvariable.h"
+#include "parseobjectconst.h"
+#include "nooperand.h"
+#include "oneoperand.h"
+#include "twooperand.h"
+#include "threeoperand.h"
+
 
 namespace {
-const boost::regex c_eLine("^([_A-Z]+)((\\s\\d+){0,3})\\s*$");
-//!< \brief Regular expression to parse assembler file line 
-const boost::regex c_eOne("(\\s\\d+)");
-const boost::regex c_eTwo("(\\s\\d+)(\\s\\d+)");
-const boost::regex c_eThree("(\\s\\d+)(\\s\\d+)(\\s\\d+)");
-//!< \brief Regular expression to parse address line and place.
+    
+const boost::regex c_eVariable("VAR\\s+(\\w+)\\s+(\\w+)\\s*$");
+//!< \brief Regular expression to parse a variable line
+const boost::regex c_eConstant("CONST\\s+(\\w+)\\s+(\\d+)\\s*$");
+//!< \brief Regular expression to parse a constant line
+const boost::regex c_eLoop("LOOP\\s+(\\w+)\\s+(\\w+)\\s+(\\w+)\\s*$");
+//!< \brief Regular expression to parse a start line of a loop construct
+const boost::regex c_ePool("POOL");
+//!< \brief Regular expression to parse a end line of a loop construct
+const boost::regex c_eCommand("([\\u_]+)(\\s+\\w+){0,3}\\s*$");
+//!< \brief Regular expression to parse an assembler command
+const boost::regex c_eOne("\\s(\\w+)");
+//!< \brief Regular expression to parse one argument
+const boost::regex c_eTwo("\\s(\\w+)\\s(\\w+)");
+//!< \brief Regular expression to parse two arguments
+const boost::regex c_eThree("\\s(\\w+)\\s(\\w+)\\s(\\w+)");
+//!< \brief Regular expression to parse three arguments
 
 
 /**
-* \brief Detect and set command type.
+* @brief Check that string is a number.
 * 
-* \details
-* The assembler has four different kinds: NoOperator, OneOperator,
-* TwoOperator, ThreeOperator. Which operation are in which type
-* is specified in SW configuration file. The information are 
-* extracted from configA. cmdA is used to search within the 
-* extracted information. If the cmdA is found in the extracted 
-* type the operation type is set.
-* 
-* \param[in] cmdA Command string from assembler file.
-* \param[out] pObjA Parse object to store command string and code type.
-* \param[in] configA Configuration file parameters.
+* @param strA Constant reference to search string.
+* @return True if all characters in search string are digits
 */
-void setCodeType(const std::string& cmdA, as::ParseObject& pObjA, as::configMap_type_t& configA)
+bool is_number(const std::string& strA)
 {
-    
-    //Temporary variables
-    std::unordered_map<std::string, as::ParseObject::CODE_TYPE> t_codeMap;
-    constexpr std::array<as::ParseObject::CODE_TYPE, 4> c_avialableCodeType {{
-        as::ParseObject::CODE_TYPE::NO_OP,
-        as::ParseObject::CODE_TYPE::ONE_OP,
-        as::ParseObject::CODE_TYPE::TWO_OP,
-        as::ParseObject::CODE_TYPE::THREE_OP
-    }};
-    
-    //Check that configuration file contains needed parameters
+    bool t_status{true};
+    for(auto it = strA.cbegin(); it != strA.cend(); ++it)
     {
-        uint8_t idx{0u};
-        for(const auto& property : {"Assembler_Property.NoOperator", "Assembler_Property.OneOperator",\
-            "Assembler_Property.TwoOperator", "Assembler_Property.ThreeOperator"})
-            {
-                if(configA.count(property))
-                {
-                    auto t_str = configA[property];
-                    {
-                        boost::tokenizer<boost::escaped_list_separator<char>> t_tok(t_str);
-                        for(auto& tok : t_tok)
-                            t_codeMap.emplace(tok, c_avialableCodeType[idx]);
-                    }
-                }
-                else
-                {
-                    std::ostringstream t_msg;
-                    t_msg << "Option \"" << property << "\" missing in configuration file";
-                    throw as::AssemblerException (t_msg.str(), 2000 + idx);
-                }
-                ++idx;
-            }
+        if(!std::isdigit(*it))
+        {
+            t_status = false;
+            break;
+        }
     }
     
-    //Detect if actual command is available and set parameters in parse object.
-    if(t_codeMap.count(cmdA))
-    {
-        pObjA.cmd = cmdA;
-        pObjA.codeType = t_codeMap.at(cmdA);
-    }
-    else
-    {
-        std::ostringstream t_msg;
-        t_msg << "Command \"" << cmdA << "\" unknown";
-        throw as::AssemblerException (t_msg.str(), 2010);
-    }
+    return t_status;
     
-    return;
 }
 
-
-} //End anonymous namespace
+} //End anonymous namespace 
 
 namespace as {
 
-Assembler::Assembler(fs::path& filePathA, as::configMap_type_t& configA, std::ostream& logA) :
-    m_filePath(filePathA), m_config(configA), m_log(logA)
+Assembler::Assembler(boost::filesystem::path& filePathA, 
+                     boost::property_tree::ptree& configA, 
+                     std::ostream& logA) :
+    m_filePath(filePathA), m_config(configA), m_log(logA), m_firstLevel{new Level()}
 {
     
-    //Validate output file option from configuration:
-    if(!m_config.count("General.Output"))
+    try
+    {
+        //Initialize output file path variable and validate.
+        m_outPath = m_config.get<std::string>("General.Output");
+    }
+    catch(boost::property_tree::ptree_error& e)
+    {
         throw as::AssemblerException ("Option \"General.Output\" missing in configuration file", 1000);
+    }
     
-    //Initialize output file path variable and validate.
-    m_outPath = m_config["General.Output"];
-    
-    if(fs::exists(m_outPath))
+    if(boost::filesystem::exists(m_outPath))
         m_log << "Warning: File" << m_outPath.filename() << " will be replaced." \
         << std::endl;
     else 
     {
         if(m_outPath.parent_path().string() != ".")
         {
-            if(fs::create_directories(m_outPath.parent_path()))
+            if(boost::filesystem::create_directories(m_outPath.parent_path()))
                 m_log << "Info: Create output file directory." << std::endl;
         }
     }
@@ -134,15 +114,56 @@ Assembler::Assembler(fs::path& filePathA, as::configMap_type_t& configA, std::os
     if(m_outFileName.extension() != ".vmc")
         throw as::AssemblerException ("Output file has wrong file extension. Expected extension \".vmc\"", 1001);
     
+    Level::setCurrentLevel(m_firstLevel);
+    
     return;
     
 }
 
+Assembler::~Assembler()
+{
+    delete m_firstLevel;
+}
+
 void Assembler::parse(void)
 {
-    
     m_log << "Start parsing assembler file" << std::endl;
     m_log << "----------------------------" << std::endl;
+    
+    //Load list of available operations and there machine ID from configuration file
+    std::unordered_map<std::string, std::vector<std::pair<std::string, uint8_t> > > t_commandMap{};
+    
+    try
+    {
+        //Temporary create vector of available operations and there machine Id of an command class.
+        std::vector<std::pair<std::string, uint8_t> > t_vec;
+        
+        //Iterate over available command classes
+        for(const std::string& iter : {"Assembler_Property.NoOperator",
+            "Assembler_Property.OneOperator",
+            "Assembler_Property.TwoOperator",
+            "Assembler_Property.ThreeOperator",
+            "Assembler_Property.ArithOperator"})
+        {
+            for(const auto& op : m_config.get_child(iter))
+                t_vec.emplace_back(op.second.get<std::string>("Name"), op.second.get<uint8_t>("MachineId", UINT8_MAX));
+            
+            t_commandMap.emplace(iter.substr(iter.find_first_of('.') + 1), std::move(t_vec));
+        }
+        
+        m_log << "Available commands: " << '\n';
+        m_log << "====================" << '\n';
+            
+        for(const auto& iter : t_commandMap)
+            for(const auto& com : iter.second)
+                m_log << com.first << ",";
+            
+        m_log << "\n\n\n" << std::endl;
+    }
+    catch(boost::property_tree::ptree_error& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
     
     //Open file
     std::filebuf t_fb;
@@ -165,91 +186,192 @@ void Assembler::parse(void)
                 ++t_count;
                 continue;
             }
-            else
+            else if(boost::regex_search(t_str, t_LineMatch, c_eLoop))
             {
-                if(boost::regex_match(t_str, t_LineMatch, c_eLine))
+                //Temporary variables to store loop parameters from parsed command string
+                int32_t t_start{0};
+                int32_t t_end{0};
+                int32_t t_step{0};
+                uint8_t t_countval{1};
+                    
+                //Get start, end and step value value for Loop
+                for(int32_t* const val : {&t_start, &t_end, &t_step})
                 {
-                    //Temporary variables
-                    ParseObject t_po;
-                    auto t_cmd = t_LineMatch[1].str();
                     
-                    //Set command code type for 
-                    try 
+                    if(is_number(t_LineMatch[t_countval].str()))
                     {
-                        setCodeType(t_cmd, t_po, m_config);
+                        *val = std::stoi(t_LineMatch[t_countval].str());
                     }
-                    catch(as::AssemblerException& e){
-                        m_log << e.what() << std::endl;
-                        //Re-Throw message
-                        throw;
-                    }
-                    
-                    //Parse additional address and/or line and/or place.
-                    bool t_match{false};
-                    boost::smatch t_NumbersMatch;
-                    switch (t_po.codeType)
+                    else
                     {
-                        case as::ParseObject::CODE_TYPE::NO_OP:
-                            break;
-                        case as::ParseObject::CODE_TYPE::ONE_OP:
-                            t_match = boost::regex_match(t_LineMatch[2].str(), t_NumbersMatch, c_eOne);
-                            break;
-                        case as::ParseObject::CODE_TYPE::TWO_OP:
-                            t_match = boost::regex_match(t_LineMatch[2].str(), t_NumbersMatch, c_eTwo);
-                            break;
-                        case as::ParseObject::CODE_TYPE::THREE_OP:
-                            t_match = boost::regex_match(t_LineMatch[2].str(), t_NumbersMatch, c_eThree);
-                            break;
-                        default:
-                            break;
-                    };
-             
-                    if(t_match)
-                    {
-                        switch(t_NumbersMatch.size())
+                        auto t_searchResult = Level::getCurrentLevel()->findParseObj(t_LineMatch[t_countval].str());
+                        if(t_searchResult)
                         {
-                            case 4: //ThreeOperator
-                                t_po.addr = std::stoi(t_NumbersMatch[1].str());
-                                t_po.cacheLine = std::stoi(t_NumbersMatch[2].str());
-                                t_po.place = std::stoi(t_NumbersMatch[3].str());
-                                break;
-                            case 3://TwoOperator
-                                t_po.addr = std::stoi(t_NumbersMatch[1].str());
-                                t_po.cacheLine = std::stoi(t_NumbersMatch[2].str());
-                                t_po.place = 127;
-                                break;
-                            case 2://OneOperator
-                                t_po.cacheLine = std::stoi(t_NumbersMatch[1].str());
-                                break;
-                            case 1://NoOperator
-                                break;
-                            default://Unknown
+                            if(t_searchResult->getCommandClass() == COMMANDCLASS::VARIABLE)
+                                *val = static_cast<ParseObjectVariable*>(t_searchResult)->getVariableValue();
+                            else if(t_searchResult->getCommandClass() == COMMANDCLASS::CONSTANT)
+                                *val = static_cast<ParseObjectConst*>(t_searchResult)->getConstValue();
+                            else
                             {
                                 std::ostringstream t_msg{""};
-                                t_msg << "Syntax error line " << t_count << ". Unknown command code type." << std::endl;
-                                throw AssemblerException(t_msg.str(), 1002);
+                                t_msg << "Syntax error line " << t_count << \
+                                    ". Arguments for LOOP command invalid." << std::endl;
+                                throw AssemblerException(t_msg.str(), 1020);
                             }
-                        };
-                        
+                        }
                     }
                     
-                    //Store parsed information from assembler file for further processing.
-                    m_fileContent.push_back(t_po);
+                    ++t_countval;
+                }
+                
+                //Create new level as a loop
+                Loop* t_loopPtr = new Loop(Loop::getCurrentLevel(), t_count, t_start, t_end, t_step,t_LineMatch[0].str());
+                Level::getCurrentLevel()->addChildLevel(static_cast<Level*>(t_loopPtr));
+                
+                //Set actual level to new created loop
+                Level::setCurrentLevel(static_cast<Level*>(t_loopPtr));
+                
+                ++t_count;
+                
+            }
+            else if(boost::regex_search(t_str, t_LineMatch, c_ePool))
+            {
+                Level::getCurrentLevel()->leave();
+                ++t_count;
+                
+            }
+            else if(boost::regex_search(t_str, t_LineMatch, c_eVariable))
+            {
+                //Temporary variable to store value of assembler variable
+                int32_t t_value{0};
+                
+                if(is_number(t_LineMatch[2].str()))
+                {
+                    t_value = std::stoi(t_LineMatch[2]);
+                }
+                else
+                {
+                    
+                    auto t_valPtr = Level::getCurrentLevel()->findParseObj(t_LineMatch[2].str());
+                    if(t_valPtr)
+                    {
+                        if(t_valPtr->getCommandClass() == COMMANDCLASS::VARIABLE)
+                            t_value = static_cast<ParseObjectVariable*>(t_valPtr)->getVariableValue();
+                        else if(t_valPtr->getCommandClass() == COMMANDCLASS::CONSTANT)
+                            t_value = static_cast<ParseObjectConst*>(t_valPtr)->getConstValue();
+                        else
+                        {
+                            std::ostringstream t_msg{""};
+                            t_msg << "Syntax error line " << t_count << \
+                                ". Arguments for VARIABLE command invalid." << std::endl;
+                            throw AssemblerException(t_msg.str(), 1030);
+                        }
                         
+                    }
+                    else
+                    {
+                        std::ostringstream t_msg{""};
+                        t_msg << "Syntax error line " << t_count << ". Variable value is invalid." << std::endl;
+                        throw AssemblerException(t_msg.str(), 1023);
+                    }
+                    
+                }
+                
+                if(std::isdigit(t_LineMatch[1].str().front()))
+                {
+                    std::ostringstream t_msg{""};
+                    t_msg << "Syntax error line " << t_count << ". Variable name starts with number." << std::endl;
+                    throw AssemblerException(t_msg.str(), 1024);
+                }
+                
+                auto t_pvPtr = new ParseObjectVariable(t_LineMatch[1].str(),
+                    t_value, Level::getCurrentLevel() ,t_LineMatch[0].str(),
+                    t_count);
+                
+                //At parse object to current level
+                Level::getCurrentLevel()->addParseObj(t_pvPtr);
+                
+                ++t_count;
+                
+            }
+            else if(boost::regex_search(t_str, t_LineMatch, c_eConstant))
+            {
+                //Temporary variable to store value of assembler variable
+                int32_t t_value{0};
+                
+                if(is_number(t_LineMatch[2].str()))
+                {
+                    t_value = std::stoi(t_LineMatch[2]);
                 }
                 else
                 {
                     std::ostringstream t_msg{""};
-                    t_msg << "Syntax error line " << t_count << ". Please correct assembler file and repeat." << std::endl;
-                    throw AssemblerException(t_msg.str(), 1002);
+                    t_msg << "Syntax error line " << t_count << ". Constant value is not an integer." << std::endl;
+                    throw AssemblerException(t_msg.str(), 1026);
+                }
+                
+                if(std::isdigit(t_LineMatch[1].str().front()))
+                {
+                    std::ostringstream t_msg{""};
+                    t_msg << "Syntax error line " << t_count << ". Constant name starts with number." << std::endl;
+                    throw AssemblerException(t_msg.str(), 1027);
+                }
+                
+                auto t_pcPtr = new ParseObjectConst(t_LineMatch[1].str(),
+                    t_value, Level::getCurrentLevel() ,t_LineMatch[0].str(),
+                    t_count);
+                
+                //At parse object to current level
+                Level::getCurrentLevel()->addParseObj(t_pcPtr);
+                
+                ++t_count;
+                
+            }
+            else if(boost::regex_search(t_str, t_LineMatch, c_eCommand))
+            {
+                //Temporary variable
+                boost::smatch t_commandMatch{};
+                
+                if(boost::regex_search(t_LineMatch[0].str(), t_commandMatch, c_eThree))
+                {
+                    
+                    
+                }
+                else if(boost::regex_search(t_LineMatch[0].str(), t_commandMatch, c_eTwo))
+                {
+                    
+                    
+                }
+                else if(boost::regex_search(t_LineMatch[0].str(), t_commandMatch, c_eOne))
+                {
+                }
+                else
+                {
+                    for(const auto& vec : t_commandMap.find("NoOperator")->second)
+                    {
+                        if(vec.first == t_LineMatch[0].str())
+                        {
+                            auto t_parseObj = new NoOperand(Level::getCurrentLevel(),t_LineMatch[0], t_count, vec.second);
+                            m_firstLevel->addParseObj(t_parseObj);
+                            break;
+                        }
+                    }
                 }
                 
                 ++t_count;
             }
+            else
+            {
+                std::ostringstream t_msg{""};
+                t_msg << "Syntax error line " << t_count << ". Unknown command code type." << std::endl;
+                throw AssemblerException(t_msg.str(), 1002);
+            }
+            
+            
         }while(!t_is.eof());
     }
     else
-        throw as::AssemblerException("Error while opening assembler source file for parsing", 1002);
+        throw as::AssemblerException("Error while opening assembler source file for parsing", 1202);
     
     
     m_log << "Parsing of assembler input file successfully finished." << std::endl;
@@ -257,98 +379,31 @@ void Assembler::parse(void)
     return;
 }
 
-void Assembler::assemble(void)
-{
-    
-    m_log << "Starting assembling of file content." << std::endl;
-    m_log << "------------------------------------" << std::endl;
-    
-    //Temporary variables:
-    boost::format t_fmtStr("0x%1$04X%2$04X");
-    // Format string to write machine code for assembler line.
-    std::ostringstream t_mc;
-    // Collect generated machine code from assembler
-    
-    //Validate, that necessary config file options available
-    uint8_t idx{0};
-    for(const auto& property : {"Assembler_Property.LineSize","Assembler_Property.PlaceSize",
-        "Assembler_Property.OpCodeSize", "VCGRA_Property.Available_Memory", "VCGRA_Property.Num_Dic_Lines",
-        "VCGRA_Property.Num_Dic_Places", "VCGRA_Property.Num_Doc_Lines", "VCGRA_Property.Num_Doc_Places",
-        "VCGRA_Property.Num_PC_Lines", "VCGRA_Property.Num_CC_Lines" })
-    {
-        if(!m_config.count(property))
-        {
-            std::ostringstream t_msg;
-            t_msg << "Option \"" << property << "\" missing in configuration file";
-            throw as::AssemblerException (t_msg.str(), 3000 + idx);
-        }
-        ++idx;
-    }
-    
-    //Properties for code assembling loaded from configuration file.
-    auto t_MemorySize = std::stoi(m_config["VCGRA_Property.Available_Memory"]);
-    auto t_placeSize = std::stoi(m_config["Assembler_Property.PlaceSize"]);
-    auto t_opCodeSize = std::stoi(m_config["Assembler_Property.OpCodeSize"]);
-    uint16_t t_as;  //Local variable to build machine operation code.
-    
-    for(auto& po : m_fileContent)
-    {
-        
-        if(po.addr > t_MemorySize)
-        {
-            std::ostringstream t_msg;
-            t_msg << "In assembler file line " << po.fileLine << ": Addressed Memory " << po.addr << " out of available address space." << std::endl;
-            throw as::AssemblerException (t_msg.str(), 3010);
-        }
-        
-        std::ostringstream t_property;
-        t_property << "Assembler_Property." << po.cmd;
-        try 
-        {
-            auto t_opCode = std::stoi(m_config[t_property.str()]);
-            t_as = 0;
-            t_as |= po.cacheLine << (t_placeSize + t_opCodeSize);
-            t_as |= po.place << t_opCodeSize;
-            t_as |= t_opCode;
-        }
-        catch( const std::exception& e)
-        {
-            std::ostringstream t_msg;
-            t_msg << "Error in generating machine code: " << e.what();
-            throw AssemblerException (t_msg.str(), 4011);
-        }
-
-        
-        t_mc << "\"" << t_fmtStr % po.addr % t_as << "\"," << std::endl;
-    }
-    
-    m_mc = t_mc.str().substr(0, t_mc.str().length() - 2);
-    
-    m_log << "Machine code successfully finished." << std::endl;
-    
-    return;
-}
-
-void Assembler::writeVmcFile()
-{
-    
-    //Opening file to store machine code.  
-    std::filebuf t_fb;
-    if(t_fb.open(m_outPath.c_str(), std::ios::out))
-    {
-        std::ostream t_codeFile(&t_fb);
-        t_codeFile << m_mc << std::endl;
-        t_fb.close();
-    }
-    else
-    {
-        throw AssemblerException("Error while opening output file.", 4500);
-    }
-    
-    m_log << "Machine operation code successfully stored at " << m_outPath << std::endl;
-    
-    return;
-    
-}
-
+// void Assembler::assemble(void)
+// {
+//     return;
+// }
+// 
+// void Assembler::writeVmcFile()
+// {
+//     
+//     //Opening file to store machine code.  
+//     std::filebuf t_fb;
+//     if(t_fb.open(m_outPath.c_str(), std::ios::out))
+//     {
+//         std::ostream t_codeFile(&t_fb);
+//         t_codeFile << m_mc << std::endl;
+//         t_fb.close();
+//     }
+//     else
+//     {
+//         throw AssemblerException("Error while opening output file.", 4500);
+//     }
+//     
+//     m_log << "Machine operation code successfully stored at " << m_outPath << std::endl;
+//     
+//     return;
+//     
+// }
+// 
 } //End namespace as

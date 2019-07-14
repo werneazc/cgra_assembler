@@ -19,13 +19,14 @@
 #define ASSEMBLER_H
 
 #include <unordered_map>
-#include <boost/program_options.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <utility>
 #include <cstdint>
+
 
 /**
 * \namespace as
@@ -34,45 +35,10 @@
 */
 namespace as {
 
-namespace fs = boost::filesystem;
-//!< \brief Abbreviation for boost file system library.
-namespace po = boost::program_options;
-//!< \brief Abbreviation for boost program option library.
-
-typedef std::unordered_map<std::string, std::string> configMap_type_t;
-//!< \brief Type definition for options from configuration file.
-
-/**
-* \struct ParseObject
-* 
-* \brief Store information of parsed assembler file line
-* 
-* \details
-* 
-* 
-*/
-struct ParseObject {
-    uint16_t fileLine{0};
-    //!< \brief Line in assembler file where the command is parsed
-    std::string cmd;
-    //!< \brief Assembler command
-    uint16_t addr{0};
-    //!< \brief Shared memory address
-    uint8_t cacheLine{0};
-    //!< \brief Cache line of target cache
-    uint8_t place{0};
-    //!< \brief Place in selected cache line
-    enum CODE_TYPE : uint8_t {
-        UNKNOWN,    //!< \brief Unknown code type
-        NO_OP,      //!< \brief Operation with no operator
-        ONE_OP,     //!< \brief Operation with one operator
-        TWO_OP,     //!< \brief Operation with two operator
-        THREE_OP    //!< \brief Operation with three operator
-    } codeType{UNKNOWN};
-    //!< \brief Code type of assembler operation
-};
-
-
+    
+//Forward declaration
+class Level;
+    
 /**
 * \class Assembler
 * 
@@ -93,14 +59,14 @@ public:
     * \param[in] configA Map of parameters from program configuration file.
     * \param[out] logA Logging stream (default = std::cout)
     */
-    Assembler ( boost::filesystem::path& filePathA, configMap_type_t& configA, \
+    Assembler ( boost::filesystem::path& filePathA, boost::property_tree::ptree& configA, \
                 std::ostream& logA = std::cout );
     
     //Destructor
     /**
     * \brief Destructor
     */
-    virtual ~Assembler() = default;
+    virtual ~Assembler();
     
     //Member functions
     /**
@@ -111,29 +77,27 @@ public:
     /**
     * \brief Create machine code from parsed assembly file
     */
-    void assemble(void);
+    //void assemble(void);
     
     /**
     * \brief Write VCGRA machine code to output file.
     */
-    void writeVmcFile(void);
+    //void writeVmcFile(void);
     
 private:
     //Member
-    fs::path& m_filePath;
+    boost::filesystem::path& m_filePath;
     //!< \brief Reference to assembler file.
-    as::configMap_type_t m_config;
+    boost::property_tree::ptree m_config;
     //!< \brief Reference to configuration map type.
-    fs::path m_outPath;
+    boost::filesystem::path m_outPath;
     //!< \brief Path to output file.
-    fs::path m_outFileName;
+    boost::filesystem::path m_outFileName;
     //!< \brief Output file name from configuration file.
     std::ostream& m_log;
     //!< \brief Logging string stream (default=std::cout)
-    std::vector<ParseObject> m_fileContent;
-    //!< \brief Assembler file content without comments.
-    std::string m_mc{""};
-    //!< \brief Machine code string which should be written to outfile.
+    Level* m_firstLevel;
+    //!< \brief Pointer to start level of parse document
     
     //Forbidden Constructor
     Assembler& operator=(const Assembler& src) = delete;
@@ -142,5 +106,6 @@ private:
     Assembler& operator=(Assembler&& src) = delete;
     
 };
+
 } //End namespace as
 #endif // ASSEMBLER_H
