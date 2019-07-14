@@ -16,8 +16,11 @@
  */
 #include <iostream>
 #include <cstdlib>
-#include "../header/assembler.h"
-#include "../header/myException.h"
+#include <boost/program_options.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include "assembler.h"
+#include "myException.h"
 
 //String variable to create error message in exception.
 std::string as::AssemblerException::m_os;
@@ -32,9 +35,13 @@ std::string as::AssemblerException::m_os;
 int main ( int argc, char **argv )
 {
     namespace po = boost::program_options;
-    //!< \brief Abbreviation for boost program option library.
+    //!< @brief Abbreviation for boost program option library.
     namespace fs = boost::filesystem;
-    //!< \brief Abbreviation for boost file system library.
+    //!< @brief Abbreviation for boost file system library.
+    namespace pt = boost::property_tree;
+    //!< @brief Abbreviation for boost file system library.
+    pt::ptree parsed_options{};
+    //!< @brief Property map with configuration options from config file.
     
     /* Define command line options for cmd-tool.
        help: Shows cmd-tool options
@@ -94,8 +101,6 @@ int main ( int argc, char **argv )
     /* Create file system path variable to validate configuration file.*/
     fs::path configPtr {vm["config"].as<std::string>().c_str() };
     //!< \brief Handle path to configuration file.
-    as::configMap_type_t configOptions;
-    //!< \brief Store options from configuration file for further usage.
     if ( !fs::exists ( configPtr ) ) {
         std::cout << "Program configuration file is missing" << std::endl;
         return EXIT_FAILURE;
@@ -113,14 +118,10 @@ int main ( int argc, char **argv )
         std::filebuf fb;
         if ( fb.open ( configPtr.c_str(), std::ios::in ) ) {
             std::istream is ( &fb );
-            auto parsed_options = po::parse_config_file ( is, desc, true );
-            po::store ( parsed_options, vm );
+            pt::read_ini(is, parsed_options);
             fb.close();
 
 
-            for ( const auto& o : parsed_options.options )
-                if ( o.unregistered )
-                    configOptions.emplace ( o.string_key, o.value.front() );
         } else {
             std::cout << "Error while loading configuration file." << std::endl;
             return EXIT_FAILURE;
@@ -140,19 +141,19 @@ int main ( int argc, char **argv )
             if(fb.open(logPtr.c_str(), std::ios::out))
             {
                 std::ostream log_os(&fb);
-                as::Assembler myAs(filePtr, configOptions, log_os);
+                as::Assembler myAs(filePtr, parsed_options, log_os);
                 myAs.parse();
-                myAs.assemble();
-                myAs.writeVmcFile();
+                //myAs.assemble();
+                //myAs.writeVmcFile();
                 fb.close();
             }
         }
         else //Run assembler with printing on std cout. 
         {
-            as::Assembler myAs(filePtr, configOptions);
+            as::Assembler myAs(filePtr, parsed_options);
             myAs.parse();
-            myAs.assemble();
-            myAs.writeVmcFile();
+            //myAs.assemble();
+            //myAs.writeVmcFile();
         }
     }
     catch(const as::AssemblerException& ce)
