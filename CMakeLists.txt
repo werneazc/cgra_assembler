@@ -29,7 +29,7 @@ add_library(parseobjects
     OBJECT
         src/parseobjbase.cpp src/parseobjectconst.cpp src/parseobjectvariable.cpp
         src/level.cpp src/loop.cpp
-        src/addinteger.cpp src/add.cpp
+        src/iarithmetic.cpp src/addinteger.cpp src/add.cpp
         src/nooperand.cpp src/oneoperand.cpp src/twooperand.cpp src/threeoperand.cpp
     )
 target_include_directories(parseobjects
@@ -87,8 +87,10 @@ target_compile_features(cgra_assembler
         cxx_std_11
     )
 target_link_libraries(cgra_assembler
-    assembler myexceptions
-    Boost::program_options Boost::filesystem Boost::regex)
+    PUBLIC
+        assembler parseobjects myexceptions
+        Boost::program_options Boost::filesystem Boost::regex
+    )
 
 
 #Create documentation with doxygen
