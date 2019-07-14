@@ -18,8 +18,9 @@
 #include <stdexcept>
 #include <algorithm>
 #include "level.h"
-#include "../header/myException.h"
-#include "../header/parseobjectvariable.h"
+#include "myException.h"
+#include "parseobjectconst.h"
+#include "parseobjectvariable.h"
 
 as::Level& operator<<(as::Level& lvlA, as::ParseObjBase* parseObjA)
 {
@@ -176,12 +177,23 @@ ParseObjBase* Level::findParseObj(const std::string& nameA)
                 break;
             }
         }
+        else if(parseObj->getCommandClass() == COMMANDCLASS::CONSTANT)
+        {
+            if(*(static_cast<ParseObjectConst*>(parseObj)) == nameA)
+            {
+                t_parseObj=parseObj;
+                break;
+            }
+        }
         else
             continue;
     }
     
     //Look for variable in parent level
-    t_parseObj = m_parentLvl->findParseObj(nameA);
+    if(m_parentLvl)
+        t_parseObj = m_parentLvl->findParseObj(nameA);
+    else
+        t_parseObj = nullptr;
         
     return t_parseObj;
 }
@@ -228,5 +240,14 @@ bool operator==(const Level& lhsA, const Level& rhsA)
     
     return true;
 }
+
+void Level::addChildLevel(Level *const levelA)
+{
+    if(levelA)
+        m_childLvlVec.push_back(levelA);
+    else
+        throw AssemblerException("Invalid level pointer for child level.", 4444);
+}
+
 
 } /* End namespace as */

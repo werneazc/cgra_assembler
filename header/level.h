@@ -92,7 +92,7 @@ public:
     * @param[in] pObjA pObjA: Object pointer of parsed object to add.
     * @return uint8_t 0=success, 1=failure.    
     */
-    virtual uint8_t addParseObj(ParseObjBase* pObjA) final;
+    uint8_t addParseObj(ParseObjBase* pObjA);
     
     /**
     * @brief Get parsed object from m_parsedObjVec.
@@ -100,7 +100,8 @@ public:
     * @param[in] idxA idxA: Element index of m_parsedObjVec vector.
     * @return ParseObjBase* nullptr, if element not found or idxA out of range
     */
-    virtual ParseObjBase* getParseObj(uint32_t idxA) const final;
+    ParseObjBase* getParseObj(uint32_t idxA) const;
+    
     
     /**
     * @brief Delete parsed object from m_parsedObjVec.
@@ -108,7 +109,7 @@ public:
     * @param[in] idxA idxA: Index of item in m_parsedObjVec going to be deleted.
     * @return as::ParseObjBase* nullptr if idxA out of range, otherwise pointer to deleted item.
     */
-    virtual ParseObjBase* deleteParseObj(uint32_t idxA) final;
+    ParseObjBase* deleteParseObj(uint32_t idxA);
     
     /**
     * @brief Find parsed object by name in current level and parent level.
@@ -116,7 +117,7 @@ public:
     * @param[in] nameA nameA: name of variable to find.
     * @return as::ParseObjBase* nullptr, if variable is not found by its name, else pointer to parse object.
     */
-    virtual ParseObjBase* findParseObj(const std::string& nameA) final;
+    ParseObjBase* findParseObj(const std::string& nameA);
     
     /**
     * @brief Add parse object to current level.
@@ -135,19 +136,26 @@ public:
     * 
     * @return uint8_t 0=success, 1=failure.
     */
-    virtual uint8_t clearParseObjList() final;
+    uint8_t clearParseObjList();
+    
+    /**
+    * @brief Add new child level to current level
+    * 
+    * @param levelA Constant pointer to new child level
+    */
+    void addChildLevel(Level* const levelA);
     
     /**
     * @brief Get access to m_parsedObjVec
     * 
     * @return const std::vector<ParseObjBase*>& Reference to m_parsedObjVec variable. 
     */
-    virtual const std::vector<ParseObjBase*>& getParseObjList() const final;
+    const std::vector<ParseObjBase*>& getParseObjList() const;
     
     /**
     * @brief Leave current level and set parent level as active level.
     */
-    virtual void leave(void);
+    void leave(void);
    
     //Static class methods:
     /**
