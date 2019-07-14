@@ -19,18 +19,19 @@
 
 namespace as {
 
-ParseObjectConst::ParseObjectConst(int32_t valueA, Level* lvlA, const std::string& cmdLineA, const uint32_t lineNumberA) :
-    as::ParseObjBase{lvlA, COMMANDCLASS::CONSTANT, cmdLineA, lineNumberA}, m_value{valueA}
+ParseObjectConst::ParseObjectConst(const std::string& nameA, int32_t valueA, Level* lvlA, 
+                                   const std::string& cmdLineA, const uint32_t lineNumberA) :
+    as::ParseObjBase{lvlA, COMMANDCLASS::CONSTANT, cmdLineA, lineNumberA}, m_value{valueA}, m_name{nameA}
 { return; }
 
 ParseObjectConst::ParseObjectConst(const ParseObjectConst& srcA) :
     ParseObjBase{srcA.getLevel(), COMMANDCLASS::CONSTANT, srcA.getReadCmdLine(), srcA.getFileLineNumber()},
-    m_value{srcA.getConstValue()}
+    m_value{srcA.getConstValue()}, m_name{srcA.getConstName()}
 { return; }
 
 ParseObjectConst::ParseObjectConst(ParseObjectConst&& srcA) :
     ParseObjBase{srcA.getLevel(), COMMANDCLASS::CONSTANT, srcA.getReadCmdLine(), srcA.getFileLineNumber()},
-    m_value{srcA.getConstValue()}
+    m_value{srcA.getConstValue()}, m_name{srcA.getConstName()}
 {
     srcA.clearMembers();
     
@@ -42,6 +43,7 @@ ParseObjectConst& ParseObjectConst::operator=(const ParseObjectConst& srcA)
     
     *(static_cast<ParseObjBase*>(this)) = static_cast<const ParseObjBase&>(srcA);
     this->m_value = srcA.getConstValue();
+    this->m_name =srcA.getConstName();
     
     return *this;
 }
@@ -53,6 +55,7 @@ ParseObjectConst& ParseObjectConst::operator=(ParseObjectConst&& srcA)
     
     *(static_cast<ParseObjBase*>(this)) = std::move(static_cast<ParseObjBase&>(srcA));
     this->m_value = srcA.getConstValue();
+    this->m_name =srcA.getConstName();
     
     srcA.clearMembers();
     
@@ -61,8 +64,25 @@ ParseObjectConst& ParseObjectConst::operator=(ParseObjectConst&& srcA)
 
 void ParseObjectConst::clearMembers(void)
 {
-    static_cast<ParseObjBase*>(this)->clearMembers();
+    ParseObjBase::clearMembers();
     m_value = INT32_MAX;
+    m_name.clear();
 }
 
+bool operator==(const ParseObjectConst& lhsA, const std::string& nameA)
+{
+    return (lhsA.getConstName() == nameA) ? true : false;
+}
+
+const std::string& ParseObjectConst::getConstName() const
+{ return m_name; }
+
+
+const int32_t ParseObjectConst::getConstValue() const
+{ return m_value; }
+
+
 } // End namespace as
+
+
+

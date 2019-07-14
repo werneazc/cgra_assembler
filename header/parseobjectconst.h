@@ -35,13 +35,14 @@ public:
     /**
     * @brief General constructor
     * 
+    * @param[in] nameA Constant name
     * @param[in] valueA Constant integer value
     * @param[in] lvlA Level pointer where constant exists
     * @param[in] cmdLineA Parsed command line in assembler file
     * @param[in] lineNumberA Line number in assembler file
     */
-    ParseObjectConst(int32_t valueA, Level* lvlA, const std::string& cmdLineA, 
-                     uint32_t lineNumberA);
+    ParseObjectConst(const std::string& nameA, int32_t valueA, Level* lvlA, 
+                     const std::string& cmdLineA, uint32_t lineNumberA);
     
     /**
     * @brief Copy constructor
@@ -81,6 +82,13 @@ public:
     const int32_t getConstValue(void) const;
     
     /**
+    * @brief Get name of constant
+    * 
+    * @return Reference to constant name
+    */
+    const std::string& getConstName(void) const;
+    
+    /**
     * @brief Delete all class members.
     * 
     */
@@ -99,8 +107,19 @@ private:
     
     int32_t m_value;
     //!< @brief Value of constant
+    std::string m_name;
+    //!< @brief Name of constant
     
 };
+
+/**
+* @brief Compare Constant with constant name
+* 
+* @param lhsA Parse object constant
+* @param nameA Search name for a parse object constant
+* @return True, if parse object has the search name of nameA
+*/
+bool operator==(const ParseObjectConst& lhsA, const std::string& nameA);
 
 } /* End namespace as */
 
