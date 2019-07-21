@@ -190,11 +190,14 @@ ParseObjBase* Level::findParseObj(const std::string& nameA)
     }
     
     //Look for variable in parent level
-    if(m_parentLvl)
-        t_parseObj = m_parentLvl->findParseObj(nameA);
-    else
-        t_parseObj = nullptr;
-        
+    if(!t_parseObj)
+    {
+        if(m_parentLvl)
+            t_parseObj = m_parentLvl->findParseObj(nameA);
+        else
+            t_parseObj = nullptr;
+    }
+    
     return t_parseObj;
 }
 
