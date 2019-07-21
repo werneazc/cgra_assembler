@@ -18,7 +18,7 @@
 #include <cstdlib>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include "assembler.h"
 #include "myException.h"
 
@@ -107,7 +107,7 @@ int main ( int argc, char **argv )
     } else if ( !fs::is_regular_file ( configPtr ) ) {
         std::cout << "Path " << configPtr.string() << " is not a regular file." << std::endl;
         return EXIT_FAILURE;
-    } else if ( configPtr.extension() != ".cfg" ) {
+    } else if ( configPtr.extension() != ".xml" ) {
         std::cout << "Configuration file " << configPtr.filename() << " has wrong file extension." << std::endl;
         return EXIT_FAILURE;
     } else if ( fs::is_empty ( configPtr ) ) {
@@ -118,11 +118,12 @@ int main ( int argc, char **argv )
         std::filebuf fb;
         if ( fb.open ( configPtr.c_str(), std::ios::in ) ) {
             std::istream is ( &fb );
-            pt::read_ini(is, parsed_options);
+            pt::read_xml(is, parsed_options);
             fb.close();
 
-
-        } else {
+        } 
+        else 
+        {
             std::cout << "Error while loading configuration file." << std::endl;
             return EXIT_FAILURE;
         }

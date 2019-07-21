@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<General>
+    <Output>./program.vmc</Output>
+</General>
+
+<VCGRA_Property>
+    <Available_Memory>4096</Available_Memory>
+    <Num_Dic_Lines>2</Num_Dic_Lines>
+    <Num_Dic_Places>8</Num_Dic_Places>
+    <Num_Doc_Lines>2</Num_Doc_Lines>
+    <Num_Doc_Places>8</Num_Doc_Places>
+    <Num_PC_Lines>2</Num_PC_Lines>
+    <Num_CC_Lines>2</Num_CC_Lines>
+</VCGRA_Property>
+
+<Assembler_Property>
+    <LineSize>3</LineSize>
+    <PlaceSize>7</PlaceSize>
+    <OpCodeSize>6</OpCodeSize>
+
+    <NoOperator>
+        <Operator>
+            <Name>NOOP</Name>
+            <MachineId>0</MachineId>
+        </Operator>
+        <Operator>
+            <Name>START</Name>
+            <MachineId>11</MachineId>
+        </Operator>
+        <Operator>
+            <Name>FINISH</Name>
+            <MachineId>12</MachineId>
+        </Operator>
+        <Operator>
+            <Name>WAIT_READY</Name>
+            <MachineId>4</MachineId>
+        </Operator>
+    </NoOperator>
+    <OneOperator>
+        <Operator>
+            <Name>SLCT_DIC_LINE</Name>
+            <MachineId>15</MachineId>
+        </Operator>
+        <Operator>
+            <Name>SLCT_DOC_LINE</Name>
+            <MachineId>16</MachineId>
+        </Operator>
+        <Operator>
+            <Name>SLCT_PECC_LINE</Name>
+            <MachineId>17</MachineId>
+        </Operator>
+        <Operator>
+            <Name>SLCT_CHCC_LINE</Name>
+            <MachineId>18</MachineId>
+        </Operator>
+    </OneOperator>
+    <TwoOperator>
+        <Operator>
+            <Name>LOADDA</Name>
+            <MachineId>6</MachineId>
+        </Operator>
+        <Operator>
+            <Name>STOREDA</Name>
+            <MachineId>8</MachineId>
+        </Operator>
+        <Operator>
+            <Name>LOADPC</Name>
+            <MachineId>9</MachineId>
+        </Operator>
+        <Operator>
+            <Name>LOADCC</Name>
+            <MachineId>10</MachineId>
+        </Operator>
+    </TwoOperator>
+    <ThreeOperator>LOADD,STORED
+        <Operator>
+            <Name>LOADD</Name>
+            <MachineId>5</MachineId>
+        </Operator>
+        <Operator>
+            <Name>STORED</Name>
+            <MachineId>7</MachineId>
+        </Operator>
+    </ThreeOperator>
+    <ArithOperator>ADD,ADDI
+        <Operator>
+            <Name>ADD</Name>
+        </Operator>
+        <Operator>
+            <Name>ADDI</Name>
+        </Operator>
+    </ArithOperator>
+</Assembler_Property>
