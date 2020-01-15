@@ -20,6 +20,7 @@
 
 #include <cstdint>
 #include <string>
+#include <iostream>
 
 
 namespace as {
@@ -173,7 +174,7 @@ public:
     * 
     */
     virtual ~ParseObjBase() = default;
-    
+
 private:
     //Forbidden Constructors
     ParseObjBase() = delete;
@@ -190,5 +191,24 @@ private:
 };
 
 } /* End namespace as */
+
+/** @brief Encapsulate coding utilities */
+namespace utils
+{
+    /**
+     * @brief Get string representation for command class 
+     * 
+     * @param[in] classA            Command class to transform into string
+     */
+    std::string commandclassToString(as::COMMANDCLASS classA);
+} // End namespace utils
+
+/**
+ * @brief Dump general information of a parse object like command class
+ * 
+ * @param[in] osA               Output stream to write data
+ * @param[in] objA              Reference to parse object
+ */
+std::ostream& operator<<(std::ostream& osA, const as::ParseObjBase& objA);
 
 #endif // PARSEOBJBASE_H

@@ -148,4 +148,40 @@ u_int32_t ParseObjBase::setLineNumber(const u_int32_t newA)
     return t_num;
 }
 
+
 } /* End namespace as */
+
+namespace utils {
+
+std::string commandclassToString(as::COMMANDCLASS classA)
+{
+    switch (classA)
+    {
+    case as::COMMANDCLASS::ARITHMETIC:
+        return "arithmetic";
+    case as::COMMANDCLASS::CONSTANT:
+        return "constant";
+    case as::COMMANDCLASS::NOOPERANT:
+        return "no-operant";
+    case as::COMMANDCLASS::ONEOPERANT:
+        return "one-operant";
+    case as::COMMANDCLASS::THREEOPERANT:
+        return "three-operant";
+    case as::COMMANDCLASS::TWOOPERANT:
+        return "two-operant";
+    case as::COMMANDCLASS::VARIABLE:
+        return "variable";
+    default:
+        return "unknown";
+    }
+}
+
+} // End namespace utils
+
+std::ostream& operator<<(std::ostream& osA, const as::ParseObjBase& objA)
+{
+    osA << objA.getFileLineNumber() << ": ";
+    osA << ::utils::commandclassToString(objA.getCommandClass());
+
+    return osA;
+}
