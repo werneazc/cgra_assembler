@@ -126,4 +126,14 @@ private:
 };
 
 } /* End namespace as */
+
+/**
+ * @brief Dump information about parsed no operant instance
+ * 
+ * @param[in] osA       Outstream to write to
+ * @param[in] opA       Reference to no-operant instance that shall be dumped
+ */
+std::ostream& operator<<(std::ostream& osA, const as::NoOperand& opA);
+
+
 #endif // NOOPERAND_H

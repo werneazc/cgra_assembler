@@ -91,3 +91,11 @@ std::string as::NoOperand::assemble(const boost::property_tree::ptree& ptreeA)
     return t_os.str();
 }
 
+
+std::ostream& operator<<(std::ostream& osA, const as::NoOperand& opA)
+{
+    osA << static_cast<const as::ParseObjBase&>(opA) << "; ";
+    osA << opA.getMachineCodeId();
+
+    return osA;
+}
