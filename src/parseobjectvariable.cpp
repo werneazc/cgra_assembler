@@ -102,3 +102,11 @@ bool operator==(const ParseObjectVariable& lhsA, const std::string& nameA)
 }
 
 } /* End namespace as */
+
+std::ostream& operator<<(std::ostream& osA, const as::ParseObjectVariable& objA)
+{
+    osA << static_cast<const as::ParseObjBase&>(objA) << "; ";
+    osA << objA.getVariableName() << "; " << objA.getVariableValue();
+
+    return osA;
+}

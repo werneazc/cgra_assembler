@@ -109,7 +109,6 @@ public:
     */
     virtual void clearMembers() override;
     
-    
 private:
     //Forbidden constructors
     ParseObjectVariable() = delete;
@@ -132,5 +131,15 @@ private:
 bool operator==(const ParseObjectVariable& lhsA, const std::string& nameA);
 
 } /* End namespace as */
+
+
+/**
+ * @brief Dump information about parsed variable
+ * 
+ * @param[in] osA       Output stream to write to
+ * @param[in] objA      Reference to parsed variable that information shall be dumped
+ */
+std::ostream& operator<<(std::ostream& osA, const as::ParseObjectVariable& objA);
+
 
 #endif // PARSEOBJECTVARIABLE_H
