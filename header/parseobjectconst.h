@@ -99,7 +99,7 @@ public:
     * @brief Destructor
     */
     ~ParseObjectConst() = default;
-    
+
 private:
     
     //Forbidden Construtors
@@ -122,5 +122,13 @@ private:
 bool operator==(const ParseObjectConst& lhsA, const std::string& nameA);
 
 } /* End namespace as */
+
+/**
+ * @brief Dump information about a parsed constant value
+ * 
+ * @param[in] osA       Output stream to write to
+ * @param[in] objA      Reference to constant which shall publish its information
+ */
+std::ostream& operator<<(std::ostream& osA, const as::ParseObjectConst& objA);
 
 #endif // PARSEOBJECTCONST_H

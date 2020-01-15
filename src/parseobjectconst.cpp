@@ -81,8 +81,13 @@ const std::string& ParseObjectConst::getConstName() const
 const int32_t ParseObjectConst::getConstValue() const
 { return m_value; }
 
-
 } // End namespace as
 
+std::ostream& operator<<(std::ostream& osA, const as::ParseObjectConst& objA)
+{
+    osA << static_cast<const as::ParseObjBase&>(objA) << "; ";
+    osA << objA.getConstName() << "; " << objA.getConstValue();
 
+    return osA;
+}
 
