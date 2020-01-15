@@ -131,4 +131,14 @@ private:
 
 } /* End namespace as */
 
+
+/**
+ * @brief Dump information about one-operant instance
+ * 
+ * @param[in] osA   Output stream to write to
+ * @param[in] opA   Reference to one operant that shall be dumped
+ * @return std::ostream& 
+ */
+std::ostream& operator<<(std::ostream& osA, const as::OneOperand& opA);
+
 #endif // ONEOPERAND_H

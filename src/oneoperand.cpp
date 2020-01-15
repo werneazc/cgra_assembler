@@ -151,3 +151,22 @@ std::string as::OneOperand::assemble(const boost::property_tree::ptree& ptreeA)
 }
 
 
+std::ostream& operator<<(std::ostream& osA, const as::OneOperand& opA)
+{
+    osA << static_cast<const as::ParseObjBase&>(opA) << "; operand: ";
+    
+    const auto* t_first = opA.getFirst();
+    
+    if(t_first->getCommandClass() == as::COMMANDCLASS::CONSTANT) {
+        osA << *(static_cast<const as::ParseObjectConst*>(t_first));
+    }
+    else if(t_first->getCommandClass() == as::COMMANDCLASS::VARIABLE) {
+        osA << *(static_cast<const as::ParseObjectVariable*>(t_first));
+    }
+    else{
+        osA << *t_first;
+    }
+    
+    return osA;
+}
+
