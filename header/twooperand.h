@@ -187,4 +187,14 @@ private:
 
 } /* End namespace as */
 
+
+/**
+ * @brief Dump information about one-operant instance
+ * 
+ * @param[in] osA   Output stream to write to
+ * @param[in] opA   Reference to two operand that shall be dumped
+ * @return std::ostream& 
+ */
+std::ostream& operator<<(std::ostream& osA, const as::TwoOperand& opA);
+
 #endif // TWOOPERAND_H
