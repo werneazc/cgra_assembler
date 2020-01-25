@@ -340,6 +340,59 @@ void Assembler::parse(void)
 
                 if(boost::regex_search(t_match, t_commandMatch, c_eThree))
                 {
+                    std::string t_command = t_commandMatch[1].str();
+                    std::array<std::string, 3> t_Ops { t_commandMatch[2].str(), t_commandMatch[3].str(), t_commandMatch[4].str() };
+                    
+                    for(const auto& vec : t_commandMap.find("ThreeOperator")->second)
+                    {
+                        
+                        if(vec.first == t_command)
+                        {
+                            as::ParseObjBase* t_first{nullptr};
+                            as::ParseObjBase* t_second{nullptr};
+                            as::ParseObjBase* t_third{nullptr};
+                            uint8_t op_cnt{0};
+
+                            for(const auto& op : t_Ops)
+                            {
+                                auto t_op = as::Level::getCurrentLevel()->findParseObj(op);
+
+                                if(!t_op)
+                                {
+                                    if(std::find_if(op.begin(), op.end(), [](unsigned char c) { return !std::isdigit(c); }) != op.end()) {
+                                        std::ostringstream t_msg{""};
+                                        t_msg << "Syntax error line " << t_count << ". Unknown variable." << std::endl;
+                                        throw AssemblerException(t_msg.str(), 1051);
+                                    }
+                                    else { 
+                                        auto t_parseObj = new as::ParseObjectConst(op, std::stoi(op), as::Level::getCurrentLevel(),
+                                                            t_commandMatch[0].str(), t_count );
+                                        as::Level::getCurrentLevel()->addParseObj(t_parseObj);
+
+                                        t_op = t_parseObj;     
+                                    }
+                                    
+                                }
+
+                                if(op_cnt == 0) {
+                                    t_first = t_op;
+                                    ++op_cnt;
+                                }
+                                else if (op_cnt == 1) {
+                                    t_second = t_op;
+                                    ++op_cnt;
+                                }
+                                else {
+                                    t_third = t_op;
+                                }
+                            }
+                                
+                            auto t_parseObj = new as::ThreeOperand(as::Level::getCurrentLevel(), t_match, t_count, t_first, t_second, t_third, vec.second);
+                            as::Level::getCurrentLevel()->addParseObj(t_parseObj);
+
+                            break;
+                        }
+                    }
                 }
                 else if(boost::regex_search(t_match, t_commandMatch, c_eTwo))
                 {
