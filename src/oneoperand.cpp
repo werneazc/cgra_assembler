@@ -25,7 +25,7 @@
 
 as::OneOperand::OneOperand(Level *const lvlA, const std::string &cmdLineA, const uint32_t lineNumberA,
                            ParseObjBase *const firstA, const uint32_t machineIdA)
-    : as::ParseObjBase{lvlA, as::COMMANDCLASS::ONEOPERANT, cmdLineA, lineNumberA},
+    : as::ParseObjBase{lvlA, as::COMMANDCLASS::ONEOPERAND, cmdLineA, lineNumberA},
       m_machnineCodeID{machineIdA}, m_first{firstA}
 {
     return;

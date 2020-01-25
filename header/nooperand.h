@@ -125,10 +125,10 @@ class NoOperand : public ParseObjBase, public IAssemble
 } /* End namespace as */
 
 /**
- * @brief Dump information about parsed no operant instance
+ * @brief Dump information about parsed no operand instance
  *
  * @param[in] osA       Outstream to write to
- * @param[in] opA       Reference to no-operant instance that shall be dumped
+ * @param[in] opA       Reference to no-operand instance that shall be dumped
  */
 std::ostream &operator<<(std::ostream &osA, const as::NoOperand &opA);
 

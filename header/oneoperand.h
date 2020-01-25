@@ -131,10 +131,10 @@ class OneOperand : public ParseObjBase, public IAssemble
 } /* End namespace as */
 
 /**
- * @brief Dump information about one-operant instance
+ * @brief Dump information about one-operand instance
  *
  * @param[in] osA   Output stream to write to
- * @param[in] opA   Reference to one operant that shall be dumped
+ * @param[in] opA   Reference to one operand that shall be dumped
  * @return std::ostream&
  */
 std::ostream &operator<<(std::ostream &osA, const as::OneOperand &opA);

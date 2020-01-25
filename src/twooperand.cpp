@@ -34,7 +34,7 @@ as::TwoOperand::TwoOperand(const TwoOperand &srcA)
 
 as::TwoOperand::TwoOperand(as::Level *const lvlA, const std::string &cmdLineA, const uint32_t lineNumberA,
                            as::ParseObjBase *const firstA, as::ParseObjBase *const secondA, const uint32_t machineIdA)
-    : as::ParseObjBase{lvlA, as::COMMANDCLASS::TWOOPERANT, cmdLineA, lineNumberA}, m_first{firstA}, m_second{secondA},
+    : as::ParseObjBase{lvlA, as::COMMANDCLASS::TWOOPERAND, cmdLineA, lineNumberA}, m_first{firstA}, m_second{secondA},
       m_machineCodeId{machineIdA}
 {
     return;

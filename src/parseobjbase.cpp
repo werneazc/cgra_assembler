@@ -157,14 +157,14 @@ std::string commandclassToString(as::COMMANDCLASS classA)
             return "arithmetic";
         case as::COMMANDCLASS::CONSTANT:
             return "constant";
-        case as::COMMANDCLASS::NOOPERANT:
-            return "no-operant";
-        case as::COMMANDCLASS::ONEOPERANT:
-            return "one-operant";
-        case as::COMMANDCLASS::THREEOPERANT:
-            return "three-operant";
-        case as::COMMANDCLASS::TWOOPERANT:
-            return "two-operant";
+        case as::COMMANDCLASS::NOOPERAND:
+            return "no-operand";
+        case as::COMMANDCLASS::ONEOPERAND:
+            return "one-operand";
+        case as::COMMANDCLASS::THREEOPERAND:
+            return "three-operand";
+        case as::COMMANDCLASS::TWOOPERAND:
+            return "two-operand";
         case as::COMMANDCLASS::VARIABLE:
             return "variable";
         default:

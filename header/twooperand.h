@@ -187,7 +187,7 @@ class TwoOperand : public ParseObjBase, public IAssemble
 } /* End namespace as */
 
 /**
- * @brief Dump information about one-operant instance
+ * @brief Dump information about two-operand instance
  *
  * @param[in] osA   Output stream to write to
  * @param[in] opA   Reference to two operand that shall be dumped

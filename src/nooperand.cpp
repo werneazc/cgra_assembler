@@ -21,7 +21,7 @@
 
 as::NoOperand::NoOperand(as::Level *const lvlA, const std::string &cmdLineA, const uint32_t lineNumberA,
                          const uint32_t machineIdA)
-    : as::ParseObjBase{lvlA, as::COMMANDCLASS::NOOPERANT, cmdLineA, lineNumberA}, m_machineCodeID{machineIdA}
+    : as::ParseObjBase{lvlA, as::COMMANDCLASS::NOOPERAND, cmdLineA, lineNumberA}, m_machineCodeID{machineIdA}
 {
     return;
 }

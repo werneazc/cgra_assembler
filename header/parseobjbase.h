@@ -39,10 +39,10 @@ enum class COMMANDCLASS : uint8_t
     UNKNOWN,      //!< @brief Unknown assembler command (error)
     CONSTANT,     //!< @brief Constant value in assembler command
     VARIABLE,     //!< @brief Variable in assembler command
-    NOOPERANT,    //!< @brief Assembler command with no operator
-    ONEOPERANT,   //!< @brief Assembler command with one operator
-    TWOOPERANT,   //!< @brief Assembler command with two operators
-    THREEOPERANT, //!< @brief Assembler command with three operators
+    NOOPERAND,    //!< @brief Assembler command with no operator
+    ONEOPERAND,   //!< @brief Assembler command with one operator
+    TWOOPERAND,   //!< @brief Assembler command with two operators
+    THREEOPERAND, //!< @brief Assembler command with three operators
     ARITHMETIC    //!< @brief Assembler command with arithmetic operations
 };
 

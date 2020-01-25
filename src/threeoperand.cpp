@@ -26,7 +26,7 @@
 as::ThreeOperand::ThreeOperand(as::Level *const lvlA, const std::string &cmdLineA, const uint32_t lineNumberA,
                                as::ParseObjBase *const firstA, as::ParseObjBase *const secondA,
                                as::ParseObjBase *const thridA, const uint32_t machienIdA)
-    : as::ParseObjBase{lvlA, as::COMMANDCLASS::THREEOPERANT, cmdLineA, lineNumberA}, m_first{firstA}, m_second{secondA},
+    : as::ParseObjBase{lvlA, as::COMMANDCLASS::THREEOPERAND, cmdLineA, lineNumberA}, m_first{firstA}, m_second{secondA},
       m_third{thridA}, m_machineCodeId{machienIdA}
 {
     return;

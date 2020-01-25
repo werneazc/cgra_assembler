@@ -195,7 +195,7 @@ class ThreeOperand : public ParseObjBase, public IAssemble
 } /* End namespace as */
 
 /**
- * @brief Dump information about one-operant instance
+ * @brief Dump information about two-operand instance
  *
  * @param[in] osA   Output stream to write to
  * @param[in] opA   Reference to three operand that shall be dumped
