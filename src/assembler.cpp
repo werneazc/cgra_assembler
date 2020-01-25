@@ -489,18 +489,21 @@ void Assembler::parse(void)
                                                                                 }
                                                                         }
 
-                                                                    auto t_parseObj = new as::TwoOperand(
-                                                                        as::Level::getCurrentLevel(), t_match, t_count,
-                                                                        t_first, t_second, vec.second);
+                                                                    if (std::strcmp(op_type, "TwoOperator") == 0)
+                                                                        {
+                                                                            auto t_parseObj = new as::TwoOperand(
+                                                                                as::Level::getCurrentLevel(), t_match,
+                                                                                t_count, t_first, t_second, vec.second);
 
-                                                                    // At parse object to current level
-                                                                    as::Level::getCurrentLevel()->addParseObj(
-                                                                        t_parseObj);
-
+                                                                            // Show properties of variable for debugging
+                                                                            std::cout << *t_parseObj << "\n";
+                                                                        }
+                                                                    else
+                                                                        {
+                                                                            // TODO: Add code for arithmetic types
+                                                                        }
+                                                                    
                                                                     found = true;
-
-                                                                    // Show properties of variable for debugging
-                                                                    std::cout << *t_parseObj << "\n";
 
                                                                     break;
                                                                 }
