@@ -44,13 +44,13 @@ const boost::regex c_eLoop("LOOP\\s+(\\w+)\\s+(\\w+)\\s+(\\w+)\\s*$");
 //!< \brief Regular expression to parse a start line of a loop construct
 const boost::regex c_ePool("POOL");
 //!< \brief Regular expression to parse a end line of a loop construct
-const boost::regex c_eCommand("([\\u_]+)(\\s+\\w+){0,3}\\s*$");
+const boost::regex c_eCommand("([\\w_]+)(\\s+\\w+){0,3}\\s*$");
 //!< \brief Regular expression to parse an assembler command
-const boost::regex c_eOne("\\s(\\w+)");
+const boost::regex c_eOne("\\s*(\\w+)\\s+(\\w+)");
 //!< \brief Regular expression to parse one argument
-const boost::regex c_eTwo("\\s(\\w+)\\s(\\w+)");
+const boost::regex c_eTwo("\\s*(\\w+)\\s+(\\w+)\\s+(\\w+)");
 //!< \brief Regular expression to parse two arguments
-const boost::regex c_eThree("\\s(\\w+)\\s(\\w+)\\s(\\w+)");
+const boost::regex c_eThree("\\s*(\\w+)\\s+(\\w+)\\s+(\\w+)\\s+(\\w+)");
 //!< \brief Regular expression to parse three arguments
 
 
@@ -323,7 +323,7 @@ void Assembler::parse(void)
                 
                 //At parse object to current level
                 Level::getCurrentLevel()->addParseObj(t_pcPtr);
-                
+
                 ++t_count;
                 
             }
@@ -331,28 +331,119 @@ void Assembler::parse(void)
             {
                 //Temporary variable
                 boost::smatch t_commandMatch{};
-                
-                if(boost::regex_search(t_LineMatch[0].str(), t_commandMatch, c_eThree))
+                /* 
+                 * Sometimes the direct usage of t_LineMatch[0].str() did not work.
+                 * Thus, the parameter for regex search is directly copies into a string constant
+                 * to overcome this issue. 
+                 */
+                const std::string t_match = t_LineMatch[0].str();
+
+                if(boost::regex_search(t_match, t_commandMatch, c_eThree))
                 {
-                    
-                    
                 }
-                else if(boost::regex_search(t_LineMatch[0].str(), t_commandMatch, c_eTwo))
+                else if(boost::regex_search(t_match, t_commandMatch, c_eTwo))
                 {
+
+                    std::string t_command = t_commandMatch[1].str();
+                    std::array<std::string, 2> t_Ops { t_commandMatch[2].str(), t_commandMatch[3].str() };
+                    bool found{false};
                     
-                    
+                    for(const auto& op_type : {"TwoOperator", "ArithOperator"})
+                    {
+                        if(!found)
+                        {
+                            for(const auto& vec : t_commandMap.find(op_type)->second)
+                            {
+                                
+                                if(vec.first == t_command)
+                                {
+                                    as::ParseObjBase* t_first{nullptr};
+                                    as::ParseObjBase* t_second{nullptr};
+                                    bool firstOp{true};
+
+                                    for(const auto& op : t_Ops)
+                                    {
+                                        auto t_op = as::Level::getCurrentLevel()->findParseObj(op);
+
+                                        if(!t_op)
+                                        {
+                                            if(std::find_if(op.begin(), op.end(), [](unsigned char c) { return !std::isdigit(c); }) != op.end()) {
+                                                std::ostringstream t_msg{""};
+                                                t_msg << "Syntax error line " << t_count << ". Unknown variable." << std::endl;
+                                                throw AssemblerException(t_msg.str(), 1051);
+                                            }
+                                            else { 
+                                                auto t_parseObj = new as::ParseObjectConst(op, std::stoi(op), as::Level::getCurrentLevel(),
+                                                                    t_commandMatch[0].str(), t_count );
+                                                as::Level::getCurrentLevel()->addParseObj(t_parseObj);
+
+                                                t_op = t_parseObj;     
+                                            }
+                                            
+                                        }
+
+                                        if(firstOp) {
+                                            t_first = t_op;
+                                            firstOp = false;
+                                        }
+                                        else {
+                                            t_second = t_op;
+                                        }
+                                    }
+                                        
+                                    auto t_parseObj = new as::TwoOperand(as::Level::getCurrentLevel(), t_match, t_count, t_first, t_second, vec.second);
+                                    as::Level::getCurrentLevel()->addParseObj(t_parseObj);
+
+                                    found=true;
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
-                else if(boost::regex_search(t_LineMatch[0].str(), t_commandMatch, c_eOne))
+                else if(boost::regex_search(t_match, t_commandMatch, c_eOne))
                 {
+                    std::string t_command = t_commandMatch[1].str();
+                    std::string t_value = t_commandMatch[2].str();
+
+                    for(const auto& vec : t_commandMap.find("OneOperator")->second)
+                    {
+                        if(vec.first == t_command)
+                        {
+                            auto t_first = as::Level::getCurrentLevel()->findParseObj(t_value);
+
+                            if(!t_first)
+                            {
+                                if(std::find_if(t_value.begin(), t_value.end(), [](unsigned char c) { return !std::isdigit(c); }) != t_value.end()) {
+                                    std::ostringstream t_msg{""};
+                                    t_msg << "Syntax error line " << t_count << ". Unknown variable." << std::endl;
+                                    throw AssemblerException(t_msg.str(), 1049);
+                                }
+                                else { 
+                                    auto t_parseObj = new as::ParseObjectConst(t_value, std::stoi(t_value), as::Level::getCurrentLevel(),
+                                                        t_commandMatch[0].str(), t_count );
+                                    as::Level::getCurrentLevel()->addParseObj(t_parseObj);
+                                    t_first = t_parseObj;
+                                }
+                            }
+                            
+                            auto t_parseObj = new as::OneOperand(as::Level::getCurrentLevel(), t_match, t_count, t_first, vec.second);
+                            as::Level::getCurrentLevel()->addParseObj(t_parseObj);
+
+                            break;
+                        }
+                    }
                 }
                 else
                 {
                     for(const auto& vec : t_commandMap.find("NoOperator")->second)
                     {
-                        if(vec.first == t_LineMatch[0].str())
+                        if(vec.first == t_match)
                         {
-                            auto t_parseObj = new NoOperand(Level::getCurrentLevel(),t_LineMatch[0], t_count, vec.second);
+                            auto t_parseObj = new NoOperand(Level::getCurrentLevel(),t_match, t_count, vec.second);
                             m_firstLevel->addParseObj(t_parseObj);
+
                             break;
                         }
                     }
