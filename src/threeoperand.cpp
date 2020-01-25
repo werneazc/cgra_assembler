@@ -229,3 +229,42 @@ std::string as::ThreeOperand::assemble(const boost::property_tree::ptree& ptreeA
     return t_os.str();
     
 }
+
+std::ostream& operator<<(std::ostream& osA, const as::ThreeOperand& opA)
+{
+    osA << static_cast<const as::ParseObjBase&>(opA) << "; ";
+        
+    std::array<const as::ParseObjBase*, 3> t_op{opA.getFirst(), opA.getSecond(), opA.getThird()};
+
+    uint8_t t_opcnt{0};
+
+    for(auto op : t_op)
+    {
+            if(t_opcnt == 0) {
+                osA << "first: ";
+                ++t_opcnt;
+            }        
+            else if(t_opcnt == 1){
+                osA << "second: ";
+                ++t_opcnt;
+            }
+            else {
+                osA << "thrird: ";
+            }
+
+            
+            if(op->getCommandClass() == as::COMMANDCLASS::CONSTANT) {
+                osA << *(static_cast<const as::ParseObjectConst*>(op));
+            }
+            else if(op->getCommandClass() == as::COMMANDCLASS::VARIABLE) {
+                osA << *(static_cast<const as::ParseObjectVariable*>(op));
+            }
+            else{
+                osA << *op;
+            }
+
+            osA << "; ";
+    }
+
+        return osA;
+}

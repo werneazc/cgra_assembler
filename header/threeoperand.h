@@ -131,7 +131,7 @@ public:
     ParseObjBase* const setThird(ParseObjBase* const thirdA);
     
     /**
-    * @brief ...
+    * @brief Get tuple of all three operands
     * 
     * @return as::ThreeOperand::operands_type_t
     */
@@ -197,5 +197,16 @@ private:
 };
 
 } /* End namespace as */
+
+
+/**
+ * @brief Dump information about one-operant instance
+ * 
+ * @param[in] osA   Output stream to write to
+ * @param[in] opA   Reference to three operand that shall be dumped
+ * @return std::ostream& 
+ */
+std::ostream& operator<<(std::ostream& osA, const as::ThreeOperand& opA);
+
 
 #endif // THREEOPERAND_H
