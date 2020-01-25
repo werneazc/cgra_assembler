@@ -290,6 +290,9 @@ void Assembler::parse(void)
                             // At parse object to current level
                             Level::getCurrentLevel()->addParseObj(t_pvPtr);
 
+                            // Show properties of variable for debugging
+                            std::cout << *t_pvPtr << "\n";
+
                             ++t_count;
                         }
                     else if (boost::regex_search(t_str, t_LineMatch, c_eConstant))
@@ -322,6 +325,9 @@ void Assembler::parse(void)
 
                             // At parse object to current level
                             Level::getCurrentLevel()->addParseObj(t_pcPtr);
+
+                            // Show properties of variable for debugging
+                            std::cout << *t_pcPtr << "\n";
 
                             ++t_count;
                         }
@@ -400,7 +406,12 @@ void Assembler::parse(void)
                                                     auto t_parseObj = new as::ThreeOperand(
                                                         as::Level::getCurrentLevel(), t_match, t_count, t_first,
                                                         t_second, t_third, vec.second);
+
+                                                    // At parse object to current level
                                                     as::Level::getCurrentLevel()->addParseObj(t_parseObj);
+
+                                                    // Show properties of variable for debugging
+                                                    std::cout << *t_parseObj << "\n";
 
                                                     break;
                                                 }
@@ -481,10 +492,15 @@ void Assembler::parse(void)
                                                                     auto t_parseObj = new as::TwoOperand(
                                                                         as::Level::getCurrentLevel(), t_match, t_count,
                                                                         t_first, t_second, vec.second);
+
+                                                                    // At parse object to current level
                                                                     as::Level::getCurrentLevel()->addParseObj(
                                                                         t_parseObj);
 
                                                                     found = true;
+
+                                                                    // Show properties of variable for debugging
+                                                                    std::cout << *t_parseObj << "\n";
 
                                                                     break;
                                                                 }
@@ -530,7 +546,12 @@ void Assembler::parse(void)
                                                     auto t_parseObj =
                                                         new as::OneOperand(as::Level::getCurrentLevel(), t_match,
                                                                            t_count, t_first, vec.second);
+
+                                                    // At parse object to current level
                                                     as::Level::getCurrentLevel()->addParseObj(t_parseObj);
+
+                                                    // Show properties of variable for debugging
+                                                    std::cout << *t_parseObj << "\n";
 
                                                     break;
                                                 }
@@ -544,7 +565,12 @@ void Assembler::parse(void)
                                                 {
                                                     auto t_parseObj = new NoOperand(Level::getCurrentLevel(), t_match,
                                                                                     t_count, vec.second);
-                                                    m_firstLevel->addParseObj(t_parseObj);
+
+                                                    // At parse object to current level
+                                                    Level::getCurrentLevel()->addParseObj(t_parseObj);
+
+                                                    // Show properties of variable for debugging
+                                                    std::cout << *t_parseObj << "\n";
 
                                                     break;
                                                 }
