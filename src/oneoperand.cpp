@@ -26,21 +26,21 @@
 as::OneOperand::OneOperand(Level *const lvlA, const std::string &cmdLineA, const uint32_t lineNumberA,
                            ParseObjBase *const firstA, const uint32_t machineIdA)
     : as::ParseObjBase{lvlA, as::COMMANDCLASS::ONEOPERAND, cmdLineA, lineNumberA},
-      m_machnineCodeID{machineIdA}, m_first{firstA}
+      m_machineCodeId{machineIdA}, m_first{firstA}
 {
     return;
 }
 
 as::OneOperand::OneOperand(const as::OneOperand &srcA)
     : as::OneOperand{srcA.getLevel(), srcA.getReadCmdLine(), srcA.getFileLineNumber(), srcA.m_first,
-                     srcA.m_machnineCodeID}
+                     srcA.m_machineCodeId}
 {
     return;
 }
 
 as::OneOperand::OneOperand(as::OneOperand &&srcA)
     : as::OneOperand{srcA.getLevel(), srcA.getReadCmdLine(), srcA.getFileLineNumber(), srcA.m_first,
-                     srcA.m_machnineCodeID}
+                     srcA.m_machineCodeId}
 {
     srcA.clearMembers();
 
@@ -51,7 +51,7 @@ as::OneOperand &as::OneOperand::operator=(const as::OneOperand &rhsA)
 {
     *(static_cast<ParseObjBase *>(this)) = static_cast<const ParseObjBase &>(rhsA);
     this->m_first = rhsA.m_first;
-    this->m_machnineCodeID = rhsA.m_machnineCodeID;
+    this->m_machineCodeId = rhsA.m_machineCodeId;
 
     return *this;
 }
@@ -60,7 +60,7 @@ as::OneOperand &as::OneOperand::operator=(as::OneOperand &&rhsA)
 {
     *(static_cast<ParseObjBase *>(this)) = std::move(static_cast<ParseObjBase &>(rhsA));
     this->m_first = rhsA.m_first;
-    this->m_machnineCodeID = rhsA.m_machnineCodeID;
+    this->m_machineCodeId = rhsA.m_machineCodeId;
 
     rhsA.clearMembers();
 
@@ -84,7 +84,7 @@ void as::OneOperand::clearMembers(void)
 {
     static_cast<ParseObjBase *>(this)->clearMembers();
     m_first = nullptr;
-    m_machnineCodeID = UINT32_MAX;
+    m_machineCodeId = UINT32_MAX;
 
     return;
 }
@@ -109,7 +109,7 @@ std::string as::OneOperand::assemble(const boost::property_tree::ptree &ptreeA)
     // Search for parameter of available cache lines for actual command
     for (const auto &opt : t_opt)
         {
-            if (ptreeA.get<uint32_t>(opt) == m_machnineCodeID)
+            if (ptreeA.get<uint32_t>(opt) == m_machineCodeId)
                 {
                     switch (t_countVal)
                         {
@@ -148,7 +148,7 @@ std::string as::OneOperand::assemble(const boost::property_tree::ptree &ptreeA)
     if (t_val <= t_numOfAvailableLines)
         {
             t_val <<= (t_OpcodeSize + t_PlaceSize);
-            t_val |= m_machnineCodeID;
+            t_val |= m_machineCodeId;
         }
     else
         throw as::AssemblerException("Selected cache line is not available.", 8614);
@@ -178,4 +178,17 @@ std::ostream &operator<<(std::ostream &osA, const as::OneOperand &opA)
         }
 
     return osA;
+}
+
+uint32_t as::OneOperand::getMachineCodeId() const
+{
+    return m_machineCodeId;
+}
+
+uint32_t as::OneOperand::setMachinenCodeId(const uint32_t machineIdA)
+{
+    auto t_val = this->m_machineCodeId;
+    this->m_machineCodeId = machineIdA;
+
+    return t_val;
 }

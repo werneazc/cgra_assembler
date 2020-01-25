@@ -110,6 +110,21 @@ class OneOperand : public ParseObjBase, public IAssemble
     ParseObjBase *const setFirst(ParseObjBase *const firstA);
 
     /**
+     * @brief Get ID for machine code of VCGRA command parser.
+     *
+     * @return Copy of stored machine code ID.
+     */
+    uint32_t getMachineCodeId(void) const;
+
+    /**
+     * @brief Set new machine code ID.
+     *
+     * @param machineIdA New machine code ID to store.
+     * @return Previous machine code ID.
+     */
+    uint32_t setMachinenCodeId(const uint32_t machineIdA);
+
+    /**
      * @brief Create machine code from assembler command.
      *
      * @param ptreeA Property tree with configuration values from SW configuration file
@@ -122,7 +137,7 @@ class OneOperand : public ParseObjBase, public IAssemble
     OneOperand(void) = delete;
 
     // Private member
-    uint32_t m_machnineCodeID;
+    uint32_t m_machineCodeId;
     //!< @brief Machine code ID for assembler command
     ParseObjBase *m_first;
     //!< @brief Pointer to operand of assembler command
