@@ -15,32 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <utility>
 #include "loop.h"
 #include "myException.h"
+#include <utility>
 
-namespace as {
-    
-Loop::Loop(Level* const parentLvlA, const uint32_t fileLineA,
-    uint32_t startValueA, uint32_t endValueA, int32_t stepwidthA,
-    const std::string readCmdA) :
-    Level{parentLvlA}, m_readCommandLine{readCmdA}, m_stepWidth{stepwidthA},
-    m_fileLine{fileLineA}
+namespace as
 {
-    if(m_stepWidth == 0)
+
+Loop::Loop(Level *const parentLvlA, const uint32_t fileLineA, uint32_t startValueA, uint32_t endValueA,
+           int32_t stepwidthA, const std::string readCmdA)
+    : Level{parentLvlA}, m_readCommandLine{readCmdA}, m_stepWidth{stepwidthA}, m_fileLine{fileLineA}
+{
+    if (m_stepWidth == 0)
         throw AssemblerException("Error: Stepwidth of zero effects endless loop", 8511);
-    else if(m_stepWidth < 0 && startValueA < endValueA)
+    else if (m_stepWidth < 0 && startValueA < endValueA)
         throw AssemblerException(
             "Error: Start value smaller then end value by negative stepwidth used for loop conditions.", 8511);
     else
-    {
-        m_startValue = startValueA;
-        m_endValue = endValueA;
-        m_currentValue = startValueA;
-    }
+        {
+            m_startValue = startValueA;
+            m_endValue = endValueA;
+            m_currentValue = startValueA;
+        }
 }
 
-Loop::Loop(Loop&& rhsA) : Level{std::move(rhsA)}
+Loop::Loop(Loop &&rhsA) : Level{std::move(rhsA)}
 {
     m_currentValue = rhsA.m_currentValue;
     rhsA.m_currentValue = INT32_MIN;
@@ -54,15 +53,14 @@ Loop::Loop(Loop&& rhsA) : Level{std::move(rhsA)}
     rhsA.m_startValue = UINT32_MAX;
     m_stepWidth = rhsA.m_stepWidth;
     rhsA.m_stepWidth = INT32_MIN;
-    
+
     return;
 }
 
-
-Loop& Loop::operator=(Loop&& rhsA) 
+Loop &Loop::operator=(Loop &&rhsA)
 {
-    *(static_cast<Level*>(this)) = std::move(rhsA);
-    
+    *(static_cast<Level *>(this)) = std::move(rhsA);
+
     m_currentValue = rhsA.m_currentValue;
     rhsA.m_currentValue = INT32_MIN;
     m_endValue = rhsA.m_endValue;
@@ -75,27 +73,25 @@ Loop& Loop::operator=(Loop&& rhsA)
     rhsA.m_startValue = UINT32_MAX;
     m_stepWidth = rhsA.m_stepWidth;
     rhsA.m_stepWidth = INT32_MIN;
-    
+
     return *this;
 }
 
-bool operator==(const Loop& lhsA, const Loop& rhsA)
+bool operator==(const Loop &lhsA, const Loop &rhsA)
 {
-    //same object
-    if(&lhsA == &rhsA)
+    // same object
+    if (&lhsA == &rhsA)
         return true;
-    
-    if(!((static_cast<const Level&>(lhsA)) == (static_cast<const Level&>(rhsA))))
+
+    if (!((static_cast<const Level &>(lhsA)) == (static_cast<const Level &>(rhsA))))
         return false;
-    
-    if( lhsA.m_currentValue != rhsA.m_currentValue ||
-        lhsA.m_endValue != rhsA.m_endValue ||
-        lhsA.m_fileLine != rhsA.m_fileLine ||
-        lhsA.m_startValue != rhsA.m_startValue ||
+
+    if (lhsA.m_currentValue != rhsA.m_currentValue || lhsA.m_endValue != rhsA.m_endValue ||
+        lhsA.m_fileLine != rhsA.m_fileLine || lhsA.m_startValue != rhsA.m_startValue ||
         lhsA.m_stepWidth != rhsA.m_stepWidth)
         return false;
-    
-    if(lhsA.m_readCommandLine == rhsA.m_readCommandLine)
+
+    if (lhsA.m_readCommandLine == rhsA.m_readCommandLine)
         return true;
     else
         return false;
@@ -104,21 +100,21 @@ bool operator==(const Loop& lhsA, const Loop& rhsA)
 bool Loop::updateLoopIndex(void)
 {
     m_currentValue += m_stepWidth;
-    
-    if(0 > m_stepWidth) //negative stepwidth
-    {
-        if(m_endValue >= m_currentValue)
-            return false;
-        else
-            return true;
-    }
+
+    if (0 > m_stepWidth) // negative stepwidth
+        {
+            if (m_endValue >= m_currentValue)
+                return false;
+            else
+                return true;
+        }
     else
-    {
-        if(m_endValue <= m_currentValue)
-            return false;
-        else
-            return true;
-    }
+        {
+            if (m_endValue <= m_currentValue)
+                return false;
+            else
+                return true;
+        }
 }
 
 } /* End namespace as */

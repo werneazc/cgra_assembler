@@ -18,177 +18,175 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
+#include "parseobjbase.h"
 #include <cstdint>
 #include <vector>
-#include "parseobjbase.h"
 
-namespace as {
+namespace as
+{
 
 /**
-* @class Level
-* 
-* @brief Level in a VCGRA assembler file
-* 
-* @details
-* A level is used to define visibility of variables and to design control flow.
-* A LOOP for instance opens a new Level and can interact with variables from its
-* parent Level or from itself. A Level includes parse objects and child levels.
-* 
-*/
+ * @class Level
+ *
+ * @brief Level in a VCGRA assembler file
+ *
+ * @details
+ * A level is used to define visibility of variables and to design control flow.
+ * A LOOP for instance opens a new Level and can interact with variables from its
+ * parent Level or from itself. A Level includes parse objects and child levels.
+ *
+ */
 class Level
 {
-public:
-    
+  public:
     /**
-    * @brief Empty constructor
-    * 
-    */
+     * @brief Empty constructor
+     *
+     */
     Level();
-    
+
     /**
-    * @brief Standard constructor to add a new child level
-    * 
-    * @param[in] parentLvlA parentLvlA: Adds new child level to actual level.
-    */
-    Level(Level* parentLvlA);
-    
+     * @brief Standard constructor to add a new child level
+     *
+     * @param[in] parentLvlA parentLvlA: Adds new child level to actual level.
+     */
+    Level(Level *parentLvlA);
+
     /**
-    * @brief Move constructor
-    * 
-    * @param[in] src src: Source from where to move content. Members of source going to be deleted.
-    */
-    Level(Level&& src);
-    
+     * @brief Move constructor
+     *
+     * @param[in] src src: Source from where to move content. Members of source going to be deleted.
+     */
+    Level(Level &&src);
+
     /**
-    * @brief Move assignment
-    * 
-    * @param[in] src src: Source from where to move content. Members of source going to be deleted.
-    * @return as::Level& New assigned level element.
-    */
-    Level& operator=(Level&& src);
-    
+     * @brief Move assignment
+     *
+     * @param[in] src src: Source from where to move content. Members of source going to be deleted.
+     * @return as::Level& New assigned level element.
+     */
+    Level &operator=(Level &&src);
+
     /**
-    * @brief Desctrutor
-    * 
-    * @details
-    * Delete function is called on all items in m_parsedObjVec and m_childLvlVec.
-    * 
-    */
+     * @brief Desctrutor
+     *
+     * @details
+     * Delete function is called on all items in m_parsedObjVec and m_childLvlVec.
+     *
+     */
     virtual ~Level();
-    
+
     /**
-    * @brief Compare to levels
-    * 
-    * @param lhsA left hand side
-    * @param rhsA right hand side
-    * @return true is member variables are identically
-    */
-    friend bool operator==(const Level& lhsA, const Level& rhsA);
-    
-    //Actions with parsed objects
+     * @brief Compare to levels
+     *
+     * @param lhsA left hand side
+     * @param rhsA right hand side
+     * @return true is member variables are identically
+     */
+    friend bool operator==(const Level &lhsA, const Level &rhsA);
+
+    // Actions with parsed objects
     /**
-    * @brief Add parse object to current level.
-    * 
-    * @param[in] pObjA pObjA: Object pointer of parsed object to add.
-    * @return uint8_t 0=success, 1=failure.    
-    */
-    uint8_t addParseObj(ParseObjBase* pObjA);
-    
+     * @brief Add parse object to current level.
+     *
+     * @param[in] pObjA pObjA: Object pointer of parsed object to add.
+     * @return uint8_t 0=success, 1=failure.
+     */
+    uint8_t addParseObj(ParseObjBase *pObjA);
+
     /**
-    * @brief Get parsed object from m_parsedObjVec.
-    * 
-    * @param[in] idxA idxA: Element index of m_parsedObjVec vector.
-    * @return ParseObjBase* nullptr, if element not found or idxA out of range
-    */
-    ParseObjBase* getParseObj(uint32_t idxA) const;
-    
-    
+     * @brief Get parsed object from m_parsedObjVec.
+     *
+     * @param[in] idxA idxA: Element index of m_parsedObjVec vector.
+     * @return ParseObjBase* nullptr, if element not found or idxA out of range
+     */
+    ParseObjBase *getParseObj(uint32_t idxA) const;
+
     /**
-    * @brief Delete parsed object from m_parsedObjVec.
-    * 
-    * @param[in] idxA idxA: Index of item in m_parsedObjVec going to be deleted.
-    * @return as::ParseObjBase* nullptr if idxA out of range, otherwise pointer to deleted item.
-    */
-    ParseObjBase* deleteParseObj(uint32_t idxA);
-    
+     * @brief Delete parsed object from m_parsedObjVec.
+     *
+     * @param[in] idxA idxA: Index of item in m_parsedObjVec going to be deleted.
+     * @return as::ParseObjBase* nullptr if idxA out of range, otherwise pointer to deleted item.
+     */
+    ParseObjBase *deleteParseObj(uint32_t idxA);
+
     /**
-    * @brief Find parsed object by name in current level and parent level.
-    * 
-    * @param[in] nameA nameA: name of variable to find.
-    * @return as::ParseObjBase* nullptr, if variable is not found by its name, else pointer to parse object.
-    */
-    ParseObjBase* findParseObj(const std::string& nameA);
-    
+     * @brief Find parsed object by name in current level and parent level.
+     *
+     * @param[in] nameA nameA: name of variable to find.
+     * @return as::ParseObjBase* nullptr, if variable is not found by its name, else pointer to parse object.
+     */
+    ParseObjBase *findParseObj(const std::string &nameA);
+
     /**
-    * @brief Add parse object to current level.
-    * 
-    * @throws AssemblerException if adding to parsed object failed.
-    * 
-    * @param[in] lvlA Level where the parsed object should be added
-    * @param[in] parseObjA Parsed object to add.
-    * @return as::Level& Level where the parsed object currently added.
-    */
-    friend Level& operator<<(Level& lvlA, ParseObjBase* parseObjA);
-    
-    //Level adapting class methods
+     * @brief Add parse object to current level.
+     *
+     * @throws AssemblerException if adding to parsed object failed.
+     *
+     * @param[in] lvlA Level where the parsed object should be added
+     * @param[in] parseObjA Parsed object to add.
+     * @return as::Level& Level where the parsed object currently added.
+     */
+    friend Level &operator<<(Level &lvlA, ParseObjBase *parseObjA);
+
+    // Level adapting class methods
     /**
-    * @brief Clear m_parsedObjVec. All items are deleted from head.
-    * 
-    * @return uint8_t 0=success, 1=failure.
-    */
+     * @brief Clear m_parsedObjVec. All items are deleted from head.
+     *
+     * @return uint8_t 0=success, 1=failure.
+     */
     uint8_t clearParseObjList();
-    
+
     /**
-    * @brief Add new child level to current level
-    * 
-    * @param levelA Constant pointer to new child level
-    */
-    void addChildLevel(Level* const levelA);
-    
+     * @brief Add new child level to current level
+     *
+     * @param levelA Constant pointer to new child level
+     */
+    void addChildLevel(Level *const levelA);
+
     /**
-    * @brief Get access to m_parsedObjVec
-    * 
-    * @return const std::vector<ParseObjBase*>& Reference to m_parsedObjVec variable. 
-    */
-    const std::vector<ParseObjBase*>& getParseObjList() const;
-    
+     * @brief Get access to m_parsedObjVec
+     *
+     * @return const std::vector<ParseObjBase*>& Reference to m_parsedObjVec variable.
+     */
+    const std::vector<ParseObjBase *> &getParseObjList() const;
+
     /**
-    * @brief Leave current level and set parent level as active level.
-    */
+     * @brief Leave current level and set parent level as active level.
+     */
     void leave(void);
-   
-    //Static class methods:
+
+    // Static class methods:
     /**
-    * @brief Set current active level activeLvl.
-    * 
-    * @param lvlA lvlA: Pointer to next active level.
-    */
-    static void setCurrentLevel(Level* lvlA);
-    
+     * @brief Set current active level activeLvl.
+     *
+     * @param lvlA lvlA: Pointer to next active level.
+     */
+    static void setCurrentLevel(Level *lvlA);
+
     /**
-    * @brief Return static class member activeLvl
-    * 
-    * @return Level*
-    */
-    static Level* getCurrentLevel(void);
-    
-private:
-    //Forbidden constructors
-    Level(const Level& src) = delete;
-    Level& operator=(const Level& src) = delete;
-    
-    //Class Members
-    std::vector<Level*> m_childLvlVec{};
+     * @brief Return static class member activeLvl
+     *
+     * @return Level*
+     */
+    static Level *getCurrentLevel(void);
+
+  private:
+    // Forbidden constructors
+    Level(const Level &src) = delete;
+    Level &operator=(const Level &src) = delete;
+
+    // Class Members
+    std::vector<Level *> m_childLvlVec{};
     //!< @brief Store child levels
-    Level* m_parentLvl;
+    Level *m_parentLvl;
     //!< @brief Store parent level
-    std::vector<ParseObjBase*> m_parsedObjVec{};
+    std::vector<ParseObjBase *> m_parsedObjVec{};
     //!< @brief Store parsed objects of actual level.
-    //Class static members
-    static Level* activeLvl;
+    // Class static members
+    static Level *activeLvl;
     //!< @brief Currently active level for adding new parsed objects.
 };
-
 
 } /* End namespace as */
 

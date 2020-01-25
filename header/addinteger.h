@@ -18,86 +18,84 @@
 #ifndef ADDINTEGER_H
 #define ADDINTEGER_H
 
-#include "parseobjbase.h"
 #include "iarithmetic.h"
+#include "parseobjbase.h"
 
-namespace as 
+namespace as
 {
 
 /**
-* @class AddInteger
-* 
-* @brief arithmetic operation to add a constand value to a variable.
-*/
+ * @class AddInteger
+ *
+ * @brief arithmetic operation to add a constand value to a variable.
+ */
 class AddInteger : public IArithmetic, public ParseObjBase
 {
-public:
-    
+  public:
     /**
-    * @brief General constructor
-    * 
-    * @param lvlA Level where the parsed object is defined.
-    * @param cmdLineA Assembler command line as a string.
-    * @param lineNumberA Line number of assembler file where the parse object is defined.
-    * @param firstA Pointer to first arithmetic operand (default=nullptr).
-    * @param secondA Pointer to second arithmetic operand (default=nullptr).
-    */
-    AddInteger(Level* lvlA, const std::string& cmdLineA, const uint32_t& lineNumberA,
-        ParseObjBase* firstA = nullptr, ParseObjBase* secondA = nullptr );
-    
+     * @brief General constructor
+     *
+     * @param lvlA Level where the parsed object is defined.
+     * @param cmdLineA Assembler command line as a string.
+     * @param lineNumberA Line number of assembler file where the parse object is defined.
+     * @param firstA Pointer to first arithmetic operand (default=nullptr).
+     * @param secondA Pointer to second arithmetic operand (default=nullptr).
+     */
+    AddInteger(Level *lvlA, const std::string &cmdLineA, const uint32_t &lineNumberA, ParseObjBase *firstA = nullptr,
+               ParseObjBase *secondA = nullptr);
+
     /**
-    * @brief Copy constructor
-    * 
-    * @param srcA Source for generated copy.
-    */
-    AddInteger(const AddInteger& srcA);
-    
+     * @brief Copy constructor
+     *
+     * @param srcA Source for generated copy.
+     */
+    AddInteger(const AddInteger &srcA);
+
     /**
-    * @brief Copy assignment
-    * 
-    * @param rhsA Source for new object. Members of source are deleted.
-    * @return New parsed object
-    */
-    AddInteger& operator=(const AddInteger& rhsA);
-    
+     * @brief Copy assignment
+     *
+     * @param rhsA Source for new object. Members of source are deleted.
+     * @return New parsed object
+     */
+    AddInteger &operator=(const AddInteger &rhsA);
+
     /**
-    * @brief Move constructor
-    * 
-    * @param srcA Members of srcA are deleted after copying.
-    */
-    AddInteger(AddInteger&& srcA);
-    
+     * @brief Move constructor
+     *
+     * @param srcA Members of srcA are deleted after copying.
+     */
+    AddInteger(AddInteger &&srcA);
+
     /**
-    * @brief Move assignment
-    * 
-    * @param rhsA Members of lhsA are deleted after copying.
-    * @return Object containing values of rhsA.
-    */
-    AddInteger& operator=(AddInteger&& rhsA);
-    
-    
+     * @brief Move assignment
+     *
+     * @param rhsA Members of lhsA are deleted after copying.
+     * @return Object containing values of rhsA.
+     */
+    AddInteger &operator=(AddInteger &&rhsA);
+
     /**
-    * @brief Destructor
-    */
+     * @brief Destructor
+     */
     virtual ~AddInteger() = default;
-    
+
     /**
-    * @brief Add m_first and m_second. Result stored at m_first.
-    * 
-    * @throws AssemblerException if dynamic_cast failed.
-    * 
-    * @return always true (return unused).
-    */
+     * @brief Add m_first and m_second. Result stored at m_first.
+     *
+     * @throws AssemblerException if dynamic_cast failed.
+     *
+     * @return always true (return unused).
+     */
     virtual bool processOperation(void) override;
-    
+
     /**
-    * @brief Clear members of integer addition instance.
-    * 
-    */
+     * @brief Clear members of integer addition instance.
+     *
+     */
     virtual void clearMembers(void) override;
-    
-private:
-    //Forbidden constructor
+
+  private:
+    // Forbidden constructor
     AddInteger() = delete;
 };
 

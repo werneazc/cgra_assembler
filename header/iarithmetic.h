@@ -20,144 +20,142 @@
 
 #include <utility>
 
-namespace as 
+namespace as
 {
-    
-//Forward declarations
+
+// Forward declarations
 class ParseObjBase;
 
 /**
-* @interface IArithmetic
-* 
-* @brief Defines interface of arithmetic assembler operations.
-* 
-* @details
-* Pure virtual function 'processOperation' needs to be defined in arithmetic
-* operation classes for a specific operation.
-*/
-class IArithmetic 
+ * @interface IArithmetic
+ *
+ * @brief Defines interface of arithmetic assembler operations.
+ *
+ * @details
+ * Pure virtual function 'processOperation' needs to be defined in arithmetic
+ * operation classes for a specific operation.
+ */
+class IArithmetic
 {
-public:
-    
-    typedef std::pair<ParseObjBase* const, ParseObjBase* const> operator_type_t;
+  public:
+    typedef std::pair<ParseObjBase *const, ParseObjBase *const> operator_type_t;
     //!< @brief Return type for the pair of operands.
-    
+
     /**
-    * @brief Empty constructor
-    */
+     * @brief Empty constructor
+     */
     IArithmetic();
-    
+
     /**
-    * @brief General constructor
-    * 
-    * @param[in] firstA Ptr. to first element of arithmetic operation; stores also result of operation.
-    * @param[in] secondA Ptr. to second element of arithmetic operation.
-    */
-    
-    IArithmetic(ParseObjBase* const firstA, ParseObjBase* const secondA);
+     * @brief General constructor
+     *
+     * @param[in] firstA Ptr. to first element of arithmetic operation; stores also result of operation.
+     * @param[in] secondA Ptr. to second element of arithmetic operation.
+     */
+
+    IArithmetic(ParseObjBase *const firstA, ParseObjBase *const secondA);
     /**
-    * @brief Copy constructor
-    * 
-    * @param[in] src Initial values for members of new object.
-    */
-    IArithmetic(const IArithmetic& src);
-    
+     * @brief Copy constructor
+     *
+     * @param[in] src Initial values for members of new object.
+     */
+    IArithmetic(const IArithmetic &src);
+
     /**
-    * @brief Move constructor
-    * 
-    * @param src Initial values for members of new element. Members of source are deleted.
-    */
-    IArithmetic(IArithmetic&& src);
-    
+     * @brief Move constructor
+     *
+     * @param src Initial values for members of new element. Members of source are deleted.
+     */
+    IArithmetic(IArithmetic &&src);
+
     /**
-    * @brief Copy assignment
-    * 
-    * @param[in] src Initial values for members of new object.
-    * @return new object
-    */
-    IArithmetic& operator=(const IArithmetic& src);
-    
+     * @brief Copy assignment
+     *
+     * @param[in] src Initial values for members of new object.
+     * @return new object
+     */
+    IArithmetic &operator=(const IArithmetic &src);
+
     /**
-    * @brief Move assignment
-    * 
-    * @param src Initial values for members of new element. Members of source are deleted.
-    * @return new object
-    */
-    IArithmetic& operator=(IArithmetic&& src);
-    
+     * @brief Move assignment
+     *
+     * @param src Initial values for members of new element. Members of source are deleted.
+     * @return new object
+     */
+    IArithmetic &operator=(IArithmetic &&src);
+
     /**
-    * @brief Destructor
-    */
+     * @brief Destructor
+     */
     virtual ~IArithmetic(void) = default;
-    
+
     /**
-    * @brief Performs an arithmetic operation. Result is stored at m_first.
-    * 
-    * @return True indicates a successful operation, false a failure.
-    */
-    virtual bool processOperation() = 0; 
-    
+     * @brief Performs an arithmetic operation. Result is stored at m_first.
+     *
+     * @return True indicates a successful operation, false a failure.
+     */
+    virtual bool processOperation() = 0;
+
     /**
-    * @brief Get a constant pointer to first operand.
-    * 
-    * @return ParseObjBase* const
-    */
-    ParseObjBase* const getFirst(void) const;
-    
+     * @brief Get a constant pointer to first operand.
+     *
+     * @return ParseObjBase* const
+     */
+    ParseObjBase *const getFirst(void) const;
+
     /**
-    * @brief Set new pointer to first operand.
-    * 
-    * @param firstA Pointer to new first operand.
-    * @return Pointer to previous first operand.
-    */
-    ParseObjBase* const setFirst(ParseObjBase* const firstA);
-    
+     * @brief Set new pointer to first operand.
+     *
+     * @param firstA Pointer to new first operand.
+     * @return Pointer to previous first operand.
+     */
+    ParseObjBase *const setFirst(ParseObjBase *const firstA);
+
     /**
-    * @brief Get a constant pointer to second operand.
-    * 
-    * @return ParseObjBase* const
-    */
-    ParseObjBase* const getSecond(void) const;
-    
+     * @brief Get a constant pointer to second operand.
+     *
+     * @return ParseObjBase* const
+     */
+    ParseObjBase *const getSecond(void) const;
+
     /**
-    * @brief Set new pointer to second operand.
-    * 
-    * @param secondA Pointer to new second operand.
-    * @return Pointer to previous second operand.
-    */
-    ParseObjBase* const setSecond(ParseObjBase* const secondA);
-    
+     * @brief Set new pointer to second operand.
+     *
+     * @param secondA Pointer to new second operand.
+     * @return Pointer to previous second operand.
+     */
+    ParseObjBase *const setSecond(ParseObjBase *const secondA);
+
     /**
-    * @brief Return operand pair with pointer to both operands.
-    * 
-    * @return as::IArithmetic::operator_type_t
-    */
+     * @brief Return operand pair with pointer to both operands.
+     *
+     * @return as::IArithmetic::operator_type_t
+     */
     operator_type_t getOperandPair(void);
-    
+
     /**
-    * @brief Set new pointers for both operands.
-    * 
-    * @param operandsA Pair of pointers to new operands (first, second).
-    * @return A pair pointer to the old operands.
-    */
-    operator_type_t setOperandPair(const operator_type_t& operandsA);
-    
+     * @brief Set new pointers for both operands.
+     *
+     * @param operandsA Pair of pointers to new operands (first, second).
+     * @return A pair pointer to the old operands.
+     */
+    operator_type_t setOperandPair(const operator_type_t &operandsA);
+
     /**
-    * @brief Set new pointers for both operands
-    * 
-    * @param firstA Pointer to new first operand.
-    * @param secondA Pointer to new second operand.
-    * @return A pair pointer to the old operands.
-    */
-    operator_type_t setOperandPair(ParseObjBase* const firstA, ParseObjBase* const secondA);
-    
-private:
-    //Class member
-    ParseObjBase* m_first;
+     * @brief Set new pointers for both operands
+     *
+     * @param firstA Pointer to new first operand.
+     * @param secondA Pointer to new second operand.
+     * @return A pair pointer to the old operands.
+     */
+    operator_type_t setOperandPair(ParseObjBase *const firstA, ParseObjBase *const secondA);
+
+  private:
+    // Class member
+    ParseObjBase *m_first;
     //!< @brief First operand of arithmetic operation which also stores the result.
-    ParseObjBase* m_second;
+    ParseObjBase *m_second;
     //!< @brief Second operand of arithmetic operation.
-    
 };
 
 } /* End namespace as */

@@ -18,195 +18,189 @@
 #ifndef THREEOPERAND_H
 #define THREEOPERAND_H
 
-#include <tuple>
-#include "parseobjbase.h"
 #include "iassemble.h"
+#include "parseobjbase.h"
+#include <tuple>
 
-namespace as 
+namespace as
 {
 
-//Forward declaration
+// Forward declaration
 class Level;
-    
+
 class ThreeOperand : public ParseObjBase, public IAssemble
 {
-public:
-    
-    typedef std::tuple<ParseObjBase* const, ParseObjBase* const, ParseObjBase* const> operands_type_t;
+  public:
+    typedef std::tuple<ParseObjBase *const, ParseObjBase *const, ParseObjBase *const> operands_type_t;
     //!< @brief Tuple type for the three operands.
-    
+
     /**
-    * @brief General constructor
-    * 
-    * @param lvlA Level where the command is placed in assembler command file.
-    * @param cmdLineA String of parsed command line in assembler file.
-    * @param lineNumber Line number in assembler file.
-    * @param firstA Handle to first argument of parsed command.
-    * @param secondA Handle to second argument of parsed command.
-    * @param thridA Handle to third argument of parsed command.
-    * @param machienIdA Machine code ID for parsed command.
-    */
-    ThreeOperand(Level* const lvlA, const std::string& cmdLineA, const uint32_t lineNumber,
-        ParseObjBase* const firstA, ParseObjBase* const secondA, ParseObjBase* const thridA, 
-        const uint32_t machienIdA);
-    
+     * @brief General constructor
+     *
+     * @param lvlA Level where the command is placed in assembler command file.
+     * @param cmdLineA String of parsed command line in assembler file.
+     * @param lineNumber Line number in assembler file.
+     * @param firstA Handle to first argument of parsed command.
+     * @param secondA Handle to second argument of parsed command.
+     * @param thridA Handle to third argument of parsed command.
+     * @param machienIdA Machine code ID for parsed command.
+     */
+    ThreeOperand(Level *const lvlA, const std::string &cmdLineA, const uint32_t lineNumber, ParseObjBase *const firstA,
+                 ParseObjBase *const secondA, ParseObjBase *const thridA, const uint32_t machienIdA);
+
     /**
-    * @brief Copy constructor
-    * 
-    * @param srcA Source for member variables of new object.
-    */
-    ThreeOperand(const ThreeOperand& srcA);
-    
+     * @brief Copy constructor
+     *
+     * @param srcA Source for member variables of new object.
+     */
+    ThreeOperand(const ThreeOperand &srcA);
+
     /**
-    * @brief Move constructor
-    * 
-    * @param srcA Source for member variables of new object. Members of source are deleted.
-    */
-    ThreeOperand(ThreeOperand&& srcA);
-    
+     * @brief Move constructor
+     *
+     * @param srcA Source for member variables of new object. Members of source are deleted.
+     */
+    ThreeOperand(ThreeOperand &&srcA);
+
     /**
-    * @brief Destructor
-    */
+     * @brief Destructor
+     */
     virtual ~ThreeOperand(void) = default;
-    
+
     /**
-    * @brief Copy assignment
-    * 
-    * @param rhsA Source for member variables of assignment object.
-    * @return Object as a copy of member variables of rhsA.
-    */
-    ThreeOperand& operator=(const ThreeOperand& rhsA);
-    
+     * @brief Copy assignment
+     *
+     * @param rhsA Source for member variables of assignment object.
+     * @return Object as a copy of member variables of rhsA.
+     */
+    ThreeOperand &operator=(const ThreeOperand &rhsA);
+
     /**
-    * @brief Move assignment
-    * 
-    * @param rhsA Source for member variables of assigned object. Members of rhsA are deleted.
-    * @return Object as a copy of member variables of rhsA.
-    */
-    ThreeOperand& operator=(ThreeOperand&& rhsA);
-    
+     * @brief Move assignment
+     *
+     * @param rhsA Source for member variables of assigned object. Members of rhsA are deleted.
+     * @return Object as a copy of member variables of rhsA.
+     */
+    ThreeOperand &operator=(ThreeOperand &&rhsA);
+
     /**
-    * @brief Get handle of first operand.
-    * 
-    * @return constant handle.
-    */
-    ParseObjBase* const getFirst(void) const;
-    
+     * @brief Get handle of first operand.
+     *
+     * @return constant handle.
+     */
+    ParseObjBase *const getFirst(void) const;
+
     /**
-    * @brief Setter for handle of first operand.
-    * 
-    * @param firstA New handle to first operand.
-    * @return Handle to previous first operand.
-    */
-    ParseObjBase* const setFirst(ParseObjBase* const firstA);
-    
+     * @brief Setter for handle of first operand.
+     *
+     * @param firstA New handle to first operand.
+     * @return Handle to previous first operand.
+     */
+    ParseObjBase *const setFirst(ParseObjBase *const firstA);
+
     /**
-    * @brief Get handle to second operand.
-    * 
-    * @return constant handle.
-    */
-    ParseObjBase* const getSecond(void) const;
-    
+     * @brief Get handle to second operand.
+     *
+     * @return constant handle.
+     */
+    ParseObjBase *const getSecond(void) const;
+
     /**
-    * @brief Setter for handle of second operand.
-    * 
-    * @param secondA Handle to new second operand.
-    * @return Handle to previous second operand.
-    */
-    ParseObjBase* const setSecond(ParseObjBase* const secondA);
-    
+     * @brief Setter for handle of second operand.
+     *
+     * @param secondA Handle to new second operand.
+     * @return Handle to previous second operand.
+     */
+    ParseObjBase *const setSecond(ParseObjBase *const secondA);
+
     /**
-    * @brief Get handle to third operand.
-    * 
-    * @return Constant handle.
-    */
-    ParseObjBase* const getThird(void) const;
-    
+     * @brief Get handle to third operand.
+     *
+     * @return Constant handle.
+     */
+    ParseObjBase *const getThird(void) const;
+
     /**
-    * @brief Setter for handle of third operand.
-    * 
-    * @param thirdA Handle to new third operand.
-    * @return Handle to previous third operand.
-    */
-    ParseObjBase* const setThird(ParseObjBase* const thirdA);
-    
+     * @brief Setter for handle of third operand.
+     *
+     * @param thirdA Handle to new third operand.
+     * @return Handle to previous third operand.
+     */
+    ParseObjBase *const setThird(ParseObjBase *const thirdA);
+
     /**
-    * @brief Get tuple of all three operands
-    * 
-    * @return as::ThreeOperand::operands_type_t
-    */
+     * @brief Get tuple of all three operands
+     *
+     * @return as::ThreeOperand::operands_type_t
+     */
     operands_type_t getOperands(void) const;
-    
+
     /**
-    * @brief Set all operands new.
-    * 
-    * @param operandsA a tuple of operands (first, second, third)
-    * @return Tuple of previous three operands.
-    */
-    operands_type_t setOperands(const operands_type_t& operandsA);
-    
+     * @brief Set all operands new.
+     *
+     * @param operandsA a tuple of operands (first, second, third)
+     * @return Tuple of previous three operands.
+     */
+    operands_type_t setOperands(const operands_type_t &operandsA);
+
     /**
-    * @brief Set all operands.
-    * 
-    * @param firstA Handle to first operand.
-    * @param secondA Handle to second new operand.
-    * @param thirdA Handle to third new operand.
-    * @return A tuple of the previous three operands.
-    */
-    operands_type_t setOperands(ParseObjBase* const firstA, 
-                                ParseObjBase* const secondA,
-                                ParseObjBase* const thirdA);
-    
+     * @brief Set all operands.
+     *
+     * @param firstA Handle to first operand.
+     * @param secondA Handle to second new operand.
+     * @param thirdA Handle to third new operand.
+     * @return A tuple of the previous three operands.
+     */
+    operands_type_t setOperands(ParseObjBase *const firstA, ParseObjBase *const secondA, ParseObjBase *const thirdA);
+
     /**
-    * @brief Get current machine code ID.
-    * 
-    * @return Machine code ID.
-    */
+     * @brief Get current machine code ID.
+     *
+     * @return Machine code ID.
+     */
     uint32_t getMachineCodeId(void) const;
-    
+
     /**
-    * @brief Set new machine code ID
-    * 
-    * @param machineIdA New machine code ID.
-    * @return Previous machine code ID.
-    */
+     * @brief Set new machine code ID
+     *
+     * @param machineIdA New machine code ID.
+     * @return Previous machine code ID.
+     */
     uint32_t setMachineCodeId(const uint32_t machineIdA);
-    
+
     /**
-    * @brief Reset all object members.
-    */
+     * @brief Reset all object members.
+     */
     virtual void clearMembers(void) override;
-    
+
     /**
-    * @brief Create machine code from assembler command.
-    * 
-    * @param ptreeA Property tree with configuration values from SW configuration file
-    * @return Machine code line for VCGRA instance.
-    */
-    virtual std::string assemble(const boost::property_tree::ptree& ptreeA) override final;
-    
-private:
-    ParseObjBase* m_first;
-    //!< @brief 
-    ParseObjBase* m_second;
-    //!< @brief 
-    ParseObjBase* m_third;
-    //!< @brief 
+     * @brief Create machine code from assembler command.
+     *
+     * @param ptreeA Property tree with configuration values from SW configuration file
+     * @return Machine code line for VCGRA instance.
+     */
+    virtual std::string assemble(const boost::property_tree::ptree &ptreeA) override final;
+
+  private:
+    ParseObjBase *m_first;
+    //!< @brief
+    ParseObjBase *m_second;
+    //!< @brief
+    ParseObjBase *m_third;
+    //!< @brief
     uint32_t m_machineCodeId;
-    //!< @brief 
+    //!< @brief
 };
 
 } /* End namespace as */
 
-
 /**
  * @brief Dump information about one-operant instance
- * 
+ *
  * @param[in] osA   Output stream to write to
  * @param[in] opA   Reference to three operand that shall be dumped
- * @return std::ostream& 
+ * @return std::ostream&
  */
-std::ostream& operator<<(std::ostream& osA, const as::ThreeOperand& opA);
-
+std::ostream &operator<<(std::ostream &osA, const as::ThreeOperand &opA);
 
 #endif // THREEOPERAND_H

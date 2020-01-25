@@ -18,84 +18,84 @@
 #ifndef ADD_H
 #define ADD_H
 
-#include "parseobjbase.h"
 #include "iarithmetic.h"
+#include "parseobjbase.h"
 
-namespace as 
+namespace as
 {
 
 /**
-* @class Add
-* 
-* @brief Add two variables and store result in m_first.
-*
-*/
+ * @class Add
+ *
+ * @brief Add two variables and store result in m_first.
+ *
+ */
 class Add : public ParseObjBase, public IArithmetic
 {
-public:
+  public:
     /**
-    * @brief General constructor
-    * 
-    * @param lvlA Level pointer where the add command exists in assembler file.
-    * @param cmdLineA Command line in assembler file.
-    * @param lineNumberA Line number in assembler file where the command is placed.
-    * @param firstA Pointer to first variable for addition.
-    * @param secondA Pointer to second variable for addition.
-    */
-    Add(Level* lvlA, const std::string& cmdLineA, const uint32_t lineNumberA,
-        ParseObjBase* const firstA = nullptr, ParseObjBase* const secondA = nullptr);
-    
+     * @brief General constructor
+     *
+     * @param lvlA Level pointer where the add command exists in assembler file.
+     * @param cmdLineA Command line in assembler file.
+     * @param lineNumberA Line number in assembler file where the command is placed.
+     * @param firstA Pointer to first variable for addition.
+     * @param secondA Pointer to second variable for addition.
+     */
+    Add(Level *lvlA, const std::string &cmdLineA, const uint32_t lineNumberA, ParseObjBase *const firstA = nullptr,
+        ParseObjBase *const secondA = nullptr);
+
     /**
-    * @brief Copy constructor
-    * 
-    * @param srcA Source to initialize members of new object.
-    */
-    Add(const Add& srcA);
-    
+     * @brief Copy constructor
+     *
+     * @param srcA Source to initialize members of new object.
+     */
+    Add(const Add &srcA);
+
     /**
-    * @brief Move constructor
-    * 
-    * @param srcA Source to initialize members of new object. Members of source are deleted.
-    */
-    Add(Add&& srcA);
-    
+     * @brief Move constructor
+     *
+     * @param srcA Source to initialize members of new object. Members of source are deleted.
+     */
+    Add(Add &&srcA);
+
     /**
-    * @brief Copy assignment
-    * 
-    * @param rhsA Source for assignment to new object.
-    * @return Object with values of rhsA.
-    */
-    Add& operator=(const Add& rhsA);
-    
+     * @brief Copy assignment
+     *
+     * @param rhsA Source for assignment to new object.
+     * @return Object with values of rhsA.
+     */
+    Add &operator=(const Add &rhsA);
+
     /**
-    * @brief Move assignment
-    * 
-    * @param rhsA Source for assignment of member variables. Members of lhs are deleted.
-    * @return Object with values of rhsA.
-    */
-    Add& operator=(Add&& rhsA);
-    
+     * @brief Move assignment
+     *
+     * @param rhsA Source for assignment of member variables. Members of lhs are deleted.
+     * @return Object with values of rhsA.
+     */
+    Add &operator=(Add &&rhsA);
+
     /**
-    * @brief Destructor
-    */
+     * @brief Destructor
+     */
     virtual ~Add() = default;
-    
+
     /**
-    * @brief Delete all members of object.
-    */
+     * @brief Delete all members of object.
+     */
     virtual void clearMembers() override;
-    
+
     /**
-    * @brief Add two variables and store result m_first.
-    * 
-    * @throws AssemblerException if one of the operands is not a variable object.
-    * 
-    * @return Always true (unused)
-    */
+     * @brief Add two variables and store result m_first.
+     *
+     * @throws AssemblerException if one of the operands is not a variable object.
+     *
+     * @return Always true (unused)
+     */
     virtual bool processOperation() override;
-    
-private:
-    //Forbidden constructor
+
+  private:
+    // Forbidden constructor
     Add() = delete;
 };
 

@@ -17,77 +17,84 @@
 
 #include "iarithmetic.h"
 
-namespace as 
+namespace as
 {
 
 IArithmetic::IArithmetic() : IArithmetic{nullptr, nullptr}
-{ return; }
+{
+    return;
+}
 
-IArithmetic::IArithmetic(ParseObjBase *const firstA, ParseObjBase *const secondA) :
- m_first{firstA}, m_second{secondA}
-{ return; }
+IArithmetic::IArithmetic(ParseObjBase *const firstA, ParseObjBase *const secondA) : m_first{firstA}, m_second{secondA}
+{
+    return;
+}
 
-IArithmetic& IArithmetic::operator=(IArithmetic && src)
+IArithmetic &IArithmetic::operator=(IArithmetic &&src)
 {
     m_first = src.m_first;
     m_first = nullptr;
     m_second = src.m_second;
     m_second = nullptr;
-    
+
     return *this;
 }
 
-IArithmetic& IArithmetic::operator=(const IArithmetic& src)
+IArithmetic &IArithmetic::operator=(const IArithmetic &src)
 {
     m_first = src.m_first;
     m_second = src.m_second;
-    
+
     return *this;
 }
 
-IArithmetic::IArithmetic(IArithmetic && src) :
-    IArithmetic{src.m_first, src.m_second}
+IArithmetic::IArithmetic(IArithmetic &&src) : IArithmetic{src.m_first, src.m_second}
 {
     src.m_first = nullptr;
     src.m_second = nullptr;
-    
+
     return;
 }
 
-IArithmetic::IArithmetic(const as::IArithmetic& src) :
-    IArithmetic{src.m_first, src.m_second}
-{ return; }
+IArithmetic::IArithmetic(const as::IArithmetic &src) : IArithmetic{src.m_first, src.m_second}
+{
+    return;
+}
 
 ParseObjBase *const IArithmetic::getFirst() const
-{ return m_first; }
+{
+    return m_first;
+}
 
 ParseObjBase *const IArithmetic::getSecond() const
-{ return m_second; }
+{
+    return m_second;
+}
 
 ParseObjBase *const IArithmetic::setFirst(as::ParseObjBase *const firstA)
 {
-    ParseObjBase* t_Ptr = nullptr;
-    
-    if(firstA != m_first)
-    {
-        t_Ptr = m_first;
-        m_first = firstA;
-    }
-        
+    ParseObjBase *t_Ptr = nullptr;
+
+    if (firstA != m_first)
+        {
+            t_Ptr = m_first;
+            m_first = firstA;
+        }
+
     return t_Ptr;
 }
 
 ParseObjBase *const IArithmetic::setSecond(as::ParseObjBase *const secondA)
 {
-    
-    ParseObjBase* t_Ptr = nullptr;
-    
-    if(secondA != m_second)
-    {
-        t_Ptr = m_second;
-        m_second = secondA;
-    }
-        
+
+    ParseObjBase *t_Ptr = nullptr;
+
+    if (secondA != m_second)
+        {
+            t_Ptr = m_second;
+            m_second = secondA;
+        }
+
     return t_Ptr;
 }
 
@@ -99,25 +106,24 @@ IArithmetic::operator_type_t IArithmetic::getOperandPair()
 IArithmetic::operator_type_t IArithmetic::setOperandPair(ParseObjBase *const firstA, ParseObjBase *const secondA)
 {
     auto t_pair = std::make_pair(m_first, m_second);
-    
-    if(m_first != firstA && m_second != secondA)
-    {
-        m_first = firstA;
-        m_second = secondA;
-    }
+
+    if (m_first != firstA && m_second != secondA)
+        {
+            m_first = firstA;
+            m_second = secondA;
+        }
     else
-    {
-        t_pair.first = nullptr;
-        t_pair.second = nullptr;
-    }
-    
+        {
+            t_pair.first = nullptr;
+            t_pair.second = nullptr;
+        }
+
     return t_pair;
 }
 
-IArithmetic::operator_type_t IArithmetic::setOperandPair(const IArithmetic::operator_type_t& operandsA)
+IArithmetic::operator_type_t IArithmetic::setOperandPair(const IArithmetic::operator_type_t &operandsA)
 {
     return this->setOperandPair(operandsA.first, operandsA.second);
 }
 
-
-}
+} // namespace as

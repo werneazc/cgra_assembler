@@ -19,126 +19,124 @@
 #ifndef ONEOPERAND_H
 #define ONEOPERAND_H
 
-#include "parseobjbase.h"
 #include "iassemble.h"
+#include "parseobjbase.h"
 
-namespace as 
+namespace as
 {
 
-//Forward declaration
+// Forward declaration
 class Level;
-    
+
 /**
-* @class OneOperand
-* 
-* @brief Parse object for assembler commands with one operand.
-*
-* @details
-* This parse object is for assembler commands with only one operand.
-* The operand is stored as a pointer to the base class and needs to be 
-* interpreted as the necessary parse object class. Moreover, the parse object
-* stored the machine code ID. 
-*/
+ * @class OneOperand
+ *
+ * @brief Parse object for assembler commands with one operand.
+ *
+ * @details
+ * This parse object is for assembler commands with only one operand.
+ * The operand is stored as a pointer to the base class and needs to be
+ * interpreted as the necessary parse object class. Moreover, the parse object
+ * stored the machine code ID.
+ */
 class OneOperand : public ParseObjBase, public IAssemble
 {
-public:
+  public:
     /**
-    * @brief General constructor
-    * 
-    * @param lvlA Level where ome-operand command exists.
-    * @param cmdLineA Command line from assembler file.
-    * @param lineNumberA Line number of assembler file.
-    * @param firstA Pointer to operand of assembler command.
-    * @param machineIdA Machine code ID for assembler command.
-    */
-    OneOperand(Level* const lvlA, const std::string& cmdLineA, uint32_t lineNumberA,
-        ParseObjBase* const firstA, const uint32_t machineIdA);
-    
+     * @brief General constructor
+     *
+     * @param lvlA Level where ome-operand command exists.
+     * @param cmdLineA Command line from assembler file.
+     * @param lineNumberA Line number of assembler file.
+     * @param firstA Pointer to operand of assembler command.
+     * @param machineIdA Machine code ID for assembler command.
+     */
+    OneOperand(Level *const lvlA, const std::string &cmdLineA, uint32_t lineNumberA, ParseObjBase *const firstA,
+               const uint32_t machineIdA);
+
     /**
-    * @brief Copy constructor
-    * 
-    * @param srcA Source for initialization of members for new object.
-    */
-    OneOperand(const OneOperand& srcA);
-    
+     * @brief Copy constructor
+     *
+     * @param srcA Source for initialization of members for new object.
+     */
+    OneOperand(const OneOperand &srcA);
+
     /**
-    * @brief Copy assignment
-    * 
-    * @param rhsA Source for member variables to assign.
-    * @return Object with a copy of member values of rhsA.
-    */
-    OneOperand& operator=(const OneOperand& rhsA);
-    
+     * @brief Copy assignment
+     *
+     * @param rhsA Source for member variables to assign.
+     * @return Object with a copy of member values of rhsA.
+     */
+    OneOperand &operator=(const OneOperand &rhsA);
+
     /**
-    * @brief Move constructor
-    * 
-    * @param srcA Source to initialize members of new object. Members of srcA are deleted.
-    */
-    OneOperand(OneOperand&& srcA);
-    
+     * @brief Move constructor
+     *
+     * @param srcA Source to initialize members of new object. Members of srcA are deleted.
+     */
+    OneOperand(OneOperand &&srcA);
+
     /**
-    * @brief Move assignment
-    * 
-    * @param rhsA Source for member variables to assign. Members of rhsA are deleted.
-    * @return Object with assigned member values of rhsA.
-    */
-    OneOperand& operator=(OneOperand&& rhsA);
-    
+     * @brief Move assignment
+     *
+     * @param rhsA Source for member variables to assign. Members of rhsA are deleted.
+     * @return Object with assigned member values of rhsA.
+     */
+    OneOperand &operator=(OneOperand &&rhsA);
+
     /**
-    * @brief Destructor
-    */
+     * @brief Destructor
+     */
     ~OneOperand() = default;
-    
+
     /**
-    * @brief Delete values of private members
-    */
+     * @brief Delete values of private members
+     */
     virtual void clearMembers(void) override;
-    
+
     /**
-    * @brief Get operand of assembler command.
-    * 
-    * @return as::ParseObjBase* const
-    */
-    ParseObjBase* const getFirst(void) const;
-    
+     * @brief Get operand of assembler command.
+     *
+     * @return as::ParseObjBase* const
+     */
+    ParseObjBase *const getFirst(void) const;
+
     /**
-    * @brief Set new operand for assembler command.
-    * 
-    * @param firstA Pointer to new operand of assembler command.
-    * @return Pointer to previous operand of assembler command.
-    */
-    ParseObjBase* const setFirst(ParseObjBase* const firstA);
-    
+     * @brief Set new operand for assembler command.
+     *
+     * @param firstA Pointer to new operand of assembler command.
+     * @return Pointer to previous operand of assembler command.
+     */
+    ParseObjBase *const setFirst(ParseObjBase *const firstA);
+
     /**
-    * @brief Create machine code from assembler command.
-    * 
-    * @param ptreeA Property tree with configuration values from SW configuration file
-    * @return Machine code line for VCGRA instance.
-    */
-    virtual std::string assemble(const boost::property_tree::ptree& ptreeA) override final;
-    
-private:
-    //Forbidden constructors
+     * @brief Create machine code from assembler command.
+     *
+     * @param ptreeA Property tree with configuration values from SW configuration file
+     * @return Machine code line for VCGRA instance.
+     */
+    virtual std::string assemble(const boost::property_tree::ptree &ptreeA) override final;
+
+  private:
+    // Forbidden constructors
     OneOperand(void) = delete;
-    
-    //Private member
+
+    // Private member
     uint32_t m_machnineCodeID;
     //!< @brief Machine code ID for assembler command
-    ParseObjBase* m_first;
+    ParseObjBase *m_first;
     //!< @brief Pointer to operand of assembler command
-    
 };
 
 } /* End namespace as */
 
-
 /**
  * @brief Dump information about one-operant instance
- * 
+ *
  * @param[in] osA   Output stream to write to
  * @param[in] opA   Reference to one operant that shall be dumped
- * @return std::ostream& 
+ * @return std::ostream&
  */
-std::ostream& operator<<(std::ostream& osA, const as::OneOperand& opA);
+std::ostream &operator<<(std::ostream &osA, const as::OneOperand &opA);
 
 #endif // ONEOPERAND_H

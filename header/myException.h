@@ -19,74 +19,70 @@
 #define MYEXCEPTION_H
 
 #include <exception>
-#include <string>
 #include <sstream>
+#include <string>
 
-namespace as {
-    
+namespace as
+{
+
 /**
-* \class AssemblerException
-* 
-* \brief Exception handler for configuration file failures.
-* 
-* \details
-* Constructor contains error ID (default = 0) and error message 
-* 
-*/
+ * \class AssemblerException
+ *
+ * \brief Exception handler for configuration file failures.
+ *
+ * \details
+ * Constructor contains error ID (default = 0) and error message
+ *
+ */
 class AssemblerException : public std::exception
 {
-public:
-    
+  public:
     /**
-    * \brief Standard constructor
-    * 
-    * \param[in] messageA Error description
-    * \param[in] errorIdA Error ID (default = 0)
-    */
-    AssemblerException (const std::string& messageA, const unsigned errorIdA = 0): 
-        m_message{messageA}, m_id{errorIdA}
-    {}
-    
-    /**
-    * \brief Return error message.
-    * 
-    * \return Error message format: Error <ID>: <Message>
-    */
-    virtual const char* what() const throw() override
+     * \brief Standard constructor
+     *
+     * \param[in] messageA Error description
+     * \param[in] errorIdA Error ID (default = 0)
+     */
+    AssemblerException(const std::string &messageA, const unsigned errorIdA = 0) : m_message{messageA}, m_id{errorIdA}
     {
-        
+    }
+
+    /**
+     * \brief Return error message.
+     *
+     * \return Error message format: Error <ID>: <Message>
+     */
+    virtual const char *what() const throw() override
+    {
+
         std::ostringstream t_os;
         t_os.str("");
-        
-        t_os << "Error " << m_id << ": "<< m_message << std::endl;
-        
-        m_os=t_os.str();
-        
+
+        t_os << "Error " << m_id << ": " << m_message << std::endl;
+
+        m_os = t_os.str();
+
         return m_os.data();
     }
-    
+
     /**
-    * \brief Destructor
-    */
+     * \brief Destructor
+     */
     virtual ~AssemblerException() = default;
 
-private:
-    
-    //Member
+  private:
+    // Member
     std::string m_message;
     //!< \brief Store error message.
     unsigned m_id;
     //!< \brief Store error ID.
     static std::string m_os;
     //!< \brief Static member function to create output message for what variable.
-    
-    //Forbidden Constructors
+
+    // Forbidden Constructors
     AssemblerException() = delete;
-    
 };
 
+} // End namespace as
 
-} //End namespace as
-
-#endif //MYEXCEPTION_H
-
+#endif // MYEXCEPTION_H

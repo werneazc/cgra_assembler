@@ -18,117 +18,114 @@
 #ifndef PARSEOBJECTCONST_H
 #define PARSEOBJECTCONST_H
 
-#include <cstdint>
 #include "parseobjbase.h"
+#include <cstdint>
 
-namespace as {
+namespace as
+{
 
 /**
-* @class ParseObjectConst
-* 
-* @brief Parsed object o a constant value in assembler file.
-*/
+ * @class ParseObjectConst
+ *
+ * @brief Parsed object o a constant value in assembler file.
+ */
 class ParseObjectConst : public as::ParseObjBase
 {
-public:
-    
+  public:
     /**
-    * @brief General constructor
-    * 
-    * @param[in] nameA Constant name
-    * @param[in] valueA Constant integer value
-    * @param[in] lvlA Level pointer where constant exists
-    * @param[in] cmdLineA Parsed command line in assembler file
-    * @param[in] lineNumberA Line number in assembler file
-    */
-    ParseObjectConst(const std::string& nameA, int32_t valueA, Level* lvlA, 
-                     const std::string& cmdLineA, uint32_t lineNumberA);
-    
+     * @brief General constructor
+     *
+     * @param[in] nameA Constant name
+     * @param[in] valueA Constant integer value
+     * @param[in] lvlA Level pointer where constant exists
+     * @param[in] cmdLineA Parsed command line in assembler file
+     * @param[in] lineNumberA Line number in assembler file
+     */
+    ParseObjectConst(const std::string &nameA, int32_t valueA, Level *lvlA, const std::string &cmdLineA,
+                     uint32_t lineNumberA);
+
     /**
-    * @brief Copy constructor
-    * 
-    * @param[in] srcA Source for constant copy.
-    */
-    ParseObjectConst(const ParseObjectConst& srcA);
-    
+     * @brief Copy constructor
+     *
+     * @param[in] srcA Source for constant copy.
+     */
+    ParseObjectConst(const ParseObjectConst &srcA);
+
     /**
-    * @brief Move constructor
-    * 
-    * @param[in] srcA Source for new constant. Members of source are deleted.
-    */
-    ParseObjectConst(ParseObjectConst&& srcA);
-    
+     * @brief Move constructor
+     *
+     * @param[in] srcA Source for new constant. Members of source are deleted.
+     */
+    ParseObjectConst(ParseObjectConst &&srcA);
+
     /**
-    * @brief Copy assignment
-    * 
-    * @param[in] srcA Source where copy is based on.
-    * @return New parsed constant with members of source.
-    */
-    ParseObjectConst& operator=(const ParseObjectConst& srcA);
-    
+     * @brief Copy assignment
+     *
+     * @param[in] srcA Source where copy is based on.
+     * @return New parsed constant with members of source.
+     */
+    ParseObjectConst &operator=(const ParseObjectConst &srcA);
+
     /**
-    * @brief Move assignment
-    * 
-    * @param[in] srcA Source to create new parsed object. Members of source are deleted.
-    * @return New parsed object with members of source.
-    */
-    ParseObjectConst& operator=(ParseObjectConst&& srcA);
-    
+     * @brief Move assignment
+     *
+     * @param[in] srcA Source to create new parsed object. Members of source are deleted.
+     * @return New parsed object with members of source.
+     */
+    ParseObjectConst &operator=(ParseObjectConst &&srcA);
+
     /**
-    * @brief Return value of constant.
-    * 
-    * @return Value of constant.
-    */
+     * @brief Return value of constant.
+     *
+     * @return Value of constant.
+     */
     const int32_t getConstValue(void) const;
-    
+
     /**
-    * @brief Get name of constant
-    * 
-    * @return Reference to constant name
-    */
-    const std::string& getConstName(void) const;
-    
+     * @brief Get name of constant
+     *
+     * @return Reference to constant name
+     */
+    const std::string &getConstName(void) const;
+
     /**
-    * @brief Delete all class members.
-    * 
-    */
+     * @brief Delete all class members.
+     *
+     */
     virtual void clearMembers(void) override;
-    
-    
+
     /**
-    * @brief Destructor
-    */
+     * @brief Destructor
+     */
     ~ParseObjectConst() = default;
 
-private:
-    
-    //Forbidden Construtors
+  private:
+    // Forbidden Construtors
     ParseObjectConst() = delete;
-    
+
     int32_t m_value;
     //!< @brief Value of constant
     std::string m_name;
     //!< @brief Name of constant
-    
 };
 
 /**
-* @brief Compare Constant with constant name
-* 
-* @param lhsA Parse object constant
-* @param nameA Search name for a parse object constant
-* @return True, if parse object has the search name of nameA
-*/
-bool operator==(const ParseObjectConst& lhsA, const std::string& nameA);
+ * @brief Compare Constant with constant name
+ *
+ * @param lhsA Parse object constant
+ * @param nameA Search name for a parse object constant
+ * @return True, if parse object has the search name of nameA
+ */
+bool operator==(const ParseObjectConst &lhsA, const std::string &nameA);
 
 } /* End namespace as */
 
 /**
  * @brief Dump information about a parsed constant value
- * 
+ *
  * @param[in] osA       Output stream to write to
  * @param[in] objA      Reference to constant which shall publish its information
  */
-std::ostream& operator<<(std::ostream& osA, const as::ParseObjectConst& objA);
+std::ostream &operator<<(std::ostream &osA, const as::ParseObjectConst &objA);
 
 #endif // PARSEOBJECTCONST_H

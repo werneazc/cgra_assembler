@@ -15,75 +15,81 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <utility>
-#include "myException.h"
 #include "addinteger.h"
-#include "parseobjectvariable.h"
+#include "myException.h"
 #include "parseobjectconst.h"
+#include "parseobjectvariable.h"
+#include <utility>
 
-namespace as 
+namespace as
 {
 
-AddInteger::AddInteger(Level* lvlA, const std::string& cmdLineA, const uint32_t& lineNumberA,
-        ParseObjBase* firstA, ParseObjBase* secondA ) :
-        IArithmetic{firstA, secondA}, ParseObjBase{lvlA, COMMANDCLASS::ARITHMETIC, cmdLineA, lineNumberA}
-{ return; }
-
-AddInteger::AddInteger(const AddInteger& srcA) : IArithmetic{srcA.getFirst(), srcA.getSecond()},
-    ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(), srcA.getFileLineNumber()}
-{ return; } 
-
-AddInteger::AddInteger(AddInteger&& srcA) : IArithmetic{srcA.getFirst(), srcA.getSecond()},
-    ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(), srcA.getFileLineNumber()}
+AddInteger::AddInteger(Level *lvlA, const std::string &cmdLineA, const uint32_t &lineNumberA, ParseObjBase *firstA,
+                       ParseObjBase *secondA)
+    : IArithmetic{firstA, secondA}, ParseObjBase{lvlA, COMMANDCLASS::ARITHMETIC, cmdLineA, lineNumberA}
 {
-    srcA.clearMembers();
-    
     return;
 }
 
-AddInteger& AddInteger::operator=(const AddInteger& rhsA)
+AddInteger::AddInteger(const AddInteger &srcA)
+    : IArithmetic{srcA.getFirst(), srcA.getSecond()}, ParseObjBase{srcA.getLevel(), srcA.getCommandClass(),
+                                                                   srcA.getReadCmdLine(), srcA.getFileLineNumber()}
 {
-    *(static_cast<ParseObjBase*>(this)) = static_cast<const ParseObjBase&>(rhsA);
+    return;
+}
+
+AddInteger::AddInteger(AddInteger &&srcA)
+    : IArithmetic{srcA.getFirst(), srcA.getSecond()}, ParseObjBase{srcA.getLevel(), srcA.getCommandClass(),
+                                                                   srcA.getReadCmdLine(), srcA.getFileLineNumber()}
+{
+    srcA.clearMembers();
+
+    return;
+}
+
+AddInteger &AddInteger::operator=(const AddInteger &rhsA)
+{
+    *(static_cast<ParseObjBase *>(this)) = static_cast<const ParseObjBase &>(rhsA);
     this->setFirst(rhsA.getFirst());
     this->setSecond(rhsA.getSecond());
-    
+
     return *this;
 }
 
-AddInteger& AddInteger::operator=(AddInteger&& rhsA)
+AddInteger &AddInteger::operator=(AddInteger &&rhsA)
 {
-    
-    *(static_cast<ParseObjBase*>(this)) = std::move(static_cast<ParseObjBase&>(rhsA));
+
+    *(static_cast<ParseObjBase *>(this)) = std::move(static_cast<ParseObjBase &>(rhsA));
     this->setFirst(rhsA.getFirst());
     this->setSecond(rhsA.getSecond());
-    
+
     rhsA.clearMembers();
-    
+
     return *this;
 }
 
 bool AddInteger::processOperation()
 {
-    auto t_first = dynamic_cast<ParseObjectVariable* const>(this->getFirst());
-    auto t_second = dynamic_cast<ParseObjectConst* const>(this->getSecond());
-    
-   if(t_first == nullptr)
-       throw AssemblerException("First argument of ADDI is not a variable.", 8504);
-   
-   if(t_second == nullptr)
-       throw AssemblerException("Second argument of ADDI is not a constant.", 8505);
-   
-   t_first->setVariableValue(t_first->getVariableValue() + t_second->getConstValue());
-   
-   return true;
+    auto t_first = dynamic_cast<ParseObjectVariable *const>(this->getFirst());
+    auto t_second = dynamic_cast<ParseObjectConst *const>(this->getSecond());
+
+    if (t_first == nullptr)
+        throw AssemblerException("First argument of ADDI is not a variable.", 8504);
+
+    if (t_second == nullptr)
+        throw AssemblerException("Second argument of ADDI is not a constant.", 8505);
+
+    t_first->setVariableValue(t_first->getVariableValue() + t_second->getConstValue());
+
+    return true;
 }
 
 void AddInteger::clearMembers()
 {
-    static_cast<ParseObjBase*>(this)->clearMembers();
+    static_cast<ParseObjBase *>(this)->clearMembers();
     this->setFirst(nullptr);
     this->setSecond(nullptr);
-    
+
     return;
 }
 

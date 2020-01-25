@@ -17,48 +17,51 @@
 
 #include "parseobjectconst.h"
 
-namespace as {
-
-ParseObjectConst::ParseObjectConst(const std::string& nameA, int32_t valueA, Level* lvlA, 
-                                   const std::string& cmdLineA, const uint32_t lineNumberA) :
-    as::ParseObjBase{lvlA, COMMANDCLASS::CONSTANT, cmdLineA, lineNumberA}, m_value{valueA}, m_name{nameA}
-{ return; }
-
-ParseObjectConst::ParseObjectConst(const ParseObjectConst& srcA) :
-    ParseObjBase{srcA.getLevel(), COMMANDCLASS::CONSTANT, srcA.getReadCmdLine(), srcA.getFileLineNumber()},
-    m_value{srcA.getConstValue()}, m_name{srcA.getConstName()}
-{ return; }
-
-ParseObjectConst::ParseObjectConst(ParseObjectConst&& srcA) :
-    ParseObjBase{srcA.getLevel(), COMMANDCLASS::CONSTANT, srcA.getReadCmdLine(), srcA.getFileLineNumber()},
-    m_value{srcA.getConstValue()}, m_name{srcA.getConstName()}
+namespace as
 {
-    srcA.clearMembers();
-    
+
+ParseObjectConst::ParseObjectConst(const std::string &nameA, int32_t valueA, Level *lvlA, const std::string &cmdLineA,
+                                   const uint32_t lineNumberA)
+    : as::ParseObjBase{lvlA, COMMANDCLASS::CONSTANT, cmdLineA, lineNumberA}, m_value{valueA}, m_name{nameA}
+{
     return;
 }
 
-ParseObjectConst& ParseObjectConst::operator=(const ParseObjectConst& srcA)
+ParseObjectConst::ParseObjectConst(const ParseObjectConst &srcA)
+    : ParseObjBase{srcA.getLevel(), COMMANDCLASS::CONSTANT, srcA.getReadCmdLine(), srcA.getFileLineNumber()},
+      m_value{srcA.getConstValue()}, m_name{srcA.getConstName()}
 {
-    
-    *(static_cast<ParseObjBase*>(this)) = static_cast<const ParseObjBase&>(srcA);
+    return;
+}
+
+ParseObjectConst::ParseObjectConst(ParseObjectConst &&srcA)
+    : ParseObjBase{srcA.getLevel(), COMMANDCLASS::CONSTANT, srcA.getReadCmdLine(), srcA.getFileLineNumber()},
+      m_value{srcA.getConstValue()}, m_name{srcA.getConstName()}
+{
+    srcA.clearMembers();
+
+    return;
+}
+
+ParseObjectConst &ParseObjectConst::operator=(const ParseObjectConst &srcA)
+{
+
+    *(static_cast<ParseObjBase *>(this)) = static_cast<const ParseObjBase &>(srcA);
     this->m_value = srcA.getConstValue();
-    this->m_name =srcA.getConstName();
-    
+    this->m_name = srcA.getConstName();
+
     return *this;
 }
 
-
-ParseObjectConst& ParseObjectConst::operator=(ParseObjectConst&& srcA)
+ParseObjectConst &ParseObjectConst::operator=(ParseObjectConst &&srcA)
 {
-    
-    
-    *(static_cast<ParseObjBase*>(this)) = std::move(static_cast<ParseObjBase&>(srcA));
+
+    *(static_cast<ParseObjBase *>(this)) = std::move(static_cast<ParseObjBase &>(srcA));
     this->m_value = srcA.getConstValue();
-    this->m_name =srcA.getConstName();
-    
+    this->m_name = srcA.getConstName();
+
     srcA.clearMembers();
-    
+
     return *this;
 }
 
@@ -69,25 +72,27 @@ void ParseObjectConst::clearMembers(void)
     m_name.clear();
 }
 
-bool operator==(const ParseObjectConst& lhsA, const std::string& nameA)
+bool operator==(const ParseObjectConst &lhsA, const std::string &nameA)
 {
     return (lhsA.getConstName() == nameA) ? true : false;
 }
 
-const std::string& ParseObjectConst::getConstName() const
-{ return m_name; }
-
+const std::string &ParseObjectConst::getConstName() const
+{
+    return m_name;
+}
 
 const int32_t ParseObjectConst::getConstValue() const
-{ return m_value; }
+{
+    return m_value;
+}
 
 } // End namespace as
 
-std::ostream& operator<<(std::ostream& osA, const as::ParseObjectConst& objA)
+std::ostream &operator<<(std::ostream &osA, const as::ParseObjectConst &objA)
 {
-    osA << static_cast<const as::ParseObjBase&>(objA) << "; ";
+    osA << static_cast<const as::ParseObjBase &>(objA) << "; ";
     osA << objA.getConstName() << "; " << objA.getConstValue();
 
     return osA;
 }
-

@@ -15,86 +15,86 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <utility>
-#include <sstream>
 #include "nooperand.h"
+#include <sstream>
+#include <utility>
 
-as::NoOperand::NoOperand(as::Level *const lvlA, const std::string& cmdLineA,
-                         const uint32_t lineNumberA, const uint32_t machineIdA) :
-    as::ParseObjBase{lvlA, as::COMMANDCLASS::NOOPERANT, cmdLineA, lineNumberA},
-    m_machineCodeID{machineIdA}
-{ return; }
+as::NoOperand::NoOperand(as::Level *const lvlA, const std::string &cmdLineA, const uint32_t lineNumberA,
+                         const uint32_t machineIdA)
+    : as::ParseObjBase{lvlA, as::COMMANDCLASS::NOOPERANT, cmdLineA, lineNumberA}, m_machineCodeID{machineIdA}
+{
+    return;
+}
 
-as::NoOperand::NoOperand(const as::NoOperand& srcA) :
-    as::ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(),
-    srcA.getFileLineNumber()}
+as::NoOperand::NoOperand(const as::NoOperand &srcA)
+    : as::ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(), srcA.getFileLineNumber()}
 {
     this->m_machineCodeID = srcA.m_machineCodeID;
     return;
 }
 
-as::NoOperand::NoOperand(as::NoOperand && srcA) :
-    as::ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(),
-    srcA.getFileLineNumber()}
+as::NoOperand::NoOperand(as::NoOperand &&srcA)
+    : as::ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(), srcA.getFileLineNumber()}
 {
     this->m_machineCodeID = srcA.m_machineCodeID;
-    
+
     srcA.clearMembers();
-    
+
     return;
 }
 
-as::NoOperand & as::NoOperand::operator=(as::NoOperand && rhsA)
+as::NoOperand &as::NoOperand::operator=(as::NoOperand &&rhsA)
 {
-    *(static_cast<ParseObjBase*>(this)) = std::move(static_cast<ParseObjBase&>(rhsA));
+    *(static_cast<ParseObjBase *>(this)) = std::move(static_cast<ParseObjBase &>(rhsA));
     this->m_machineCodeID = rhsA.m_machineCodeID;
-    
+
     rhsA.clearMembers();
-    
+
     return *this;
 }
 
-as::NoOperand & as::NoOperand::operator=(const as::NoOperand& rhsA)
+as::NoOperand &as::NoOperand::operator=(const as::NoOperand &rhsA)
 {
-    *(static_cast<ParseObjBase*>(this)) = static_cast<const ParseObjBase&>(rhsA);
+    *(static_cast<ParseObjBase *>(this)) = static_cast<const ParseObjBase &>(rhsA);
     this->m_machineCodeID = rhsA.m_machineCodeID;
-    
+
     return *this;
 }
 
 void as::NoOperand::clearMembers(void)
 {
-    static_cast<ParseObjBase* const>(this)->clearMembers();
+    static_cast<ParseObjBase *const>(this)->clearMembers();
     m_machineCodeID = UINT32_MAX;
-    
+
     return;
 }
 
 uint32_t as::NoOperand::getMachineCodeId() const
-{ return m_machineCodeID; }
+{
+    return m_machineCodeID;
+}
 
 uint32_t as::NoOperand::setMachineCodeId(const uint32_t machineIdA)
 {
     auto t_val = m_machineCodeID;
     m_machineCodeID = machineIdA;
-    
+
     return t_val;
 }
 
-std::string as::NoOperand::assemble(const boost::property_tree::ptree& ptreeA)
+std::string as::NoOperand::assemble(const boost::property_tree::ptree &ptreeA)
 {
-    //Temporary variables
+    // Temporary variables
     std::ostringstream t_os{""};
-    
+
     t_os << "\"" << m_fmtStr % 0u % this->getMachineCodeId() << "\"";
-    
+
     return t_os.str();
 }
 
-
-std::ostream& operator<<(std::ostream& osA, const as::NoOperand& opA)
+std::ostream &operator<<(std::ostream &osA, const as::NoOperand &opA)
 {
-    osA << static_cast<const as::ParseObjBase&>(opA) << "; ";
+    osA << static_cast<const as::ParseObjBase &>(opA) << "; ";
     osA << opA.getMachineCodeId();
 
     return osA;

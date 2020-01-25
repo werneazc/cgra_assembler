@@ -15,70 +15,74 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <utility>
 #include "add.h"
-#include "parseobjectvariable.h"
 #include "myException.h"
+#include "parseobjectvariable.h"
+#include <utility>
 
-namespace as 
+namespace as
 {
-Add::Add(Level* lvlA, const std::string& cmdLineA, const uint32_t lineNumberA,
-    ParseObjBase* const firstA, ParseObjBase* const secondA) : 
-    ParseObjBase{lvlA, COMMANDCLASS::ARITHMETIC, cmdLineA, lineNumberA}, IArithmetic{firstA, secondA}
-{ return; }
-
-Add::Add(const Add& srcA) :
-    ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(),
-        srcA.getFileLineNumber()}, IArithmetic{srcA.getFirst(), srcA.getSecond()}
-{ return; }
-
-Add::Add(Add&& srcA) :
-    ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(),
-        srcA.getFileLineNumber()}, IArithmetic{srcA.getFirst(), srcA.getSecond()}
-{ 
-    srcA.clearMembers();
-    return; 
+Add::Add(Level *lvlA, const std::string &cmdLineA, const uint32_t lineNumberA, ParseObjBase *const firstA,
+         ParseObjBase *const secondA)
+    : ParseObjBase{lvlA, COMMANDCLASS::ARITHMETIC, cmdLineA, lineNumberA}, IArithmetic{firstA, secondA}
+{
+    return;
 }
 
-Add& Add::operator=(const Add& rhsA)
+Add::Add(const Add &srcA)
+    : ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(), srcA.getFileLineNumber()},
+      IArithmetic{srcA.getFirst(), srcA.getSecond()}
 {
-    *(static_cast<ParseObjBase*>(this)) = static_cast<const ParseObjBase&>(rhsA);
+    return;
+}
+
+Add::Add(Add &&srcA)
+    : ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(), srcA.getFileLineNumber()},
+      IArithmetic{srcA.getFirst(), srcA.getSecond()}
+{
+    srcA.clearMembers();
+    return;
+}
+
+Add &Add::operator=(const Add &rhsA)
+{
+    *(static_cast<ParseObjBase *>(this)) = static_cast<const ParseObjBase &>(rhsA);
     this->setFirst(rhsA.getFirst());
     this->setSecond(rhsA.getSecond());
-    
+
     return *this;
 }
 
-Add& Add::operator=(Add&& rhsA)
+Add &Add::operator=(Add &&rhsA)
 {
-    *(static_cast<ParseObjBase*>(this)) = std::move(static_cast<ParseObjBase&>(rhsA));
+    *(static_cast<ParseObjBase *>(this)) = std::move(static_cast<ParseObjBase &>(rhsA));
     this->setFirst(rhsA.getFirst());
     this->setSecond(rhsA.getSecond());
-    
+
     rhsA.clearMembers();
-    
+
     return *this;
 }
 
 void Add::clearMembers(void)
 {
-    static_cast<ParseObjBase*>(this)->clearMembers();
+    static_cast<ParseObjBase *>(this)->clearMembers();
     this->setFirst(nullptr);
     this->setSecond(nullptr);
-    
+
     return;
 }
 
 bool Add::processOperation(void)
 {
-    auto t_first = dynamic_cast<ParseObjectVariable* const>(this->getFirst());
-    auto t_second = dynamic_cast<ParseObjectVariable* const>(this->getSecond());
-    
-    if(!(t_first && t_second))
+    auto t_first = dynamic_cast<ParseObjectVariable *const>(this->getFirst());
+    auto t_second = dynamic_cast<ParseObjectVariable *const>(this->getSecond());
+
+    if (!(t_first && t_second))
         throw AssemblerException("Error Addition: One of the operands is not a variable type", 8525);
     else
         t_first->setVariableValue(t_first->getVariableValue() + t_second->getVariableValue());
-    
+
     return true;
 }
 
