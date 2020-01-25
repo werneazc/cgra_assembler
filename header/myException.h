@@ -50,7 +50,7 @@ class AssemblerException : public std::exception
     /**
      * \brief Return error message.
      *
-     * \return Error message format: Error <ID>: <Message>
+     * \return Error message format: Error \<ID\>: \<Message\>
      */
     virtual const char *what() const throw() override
     {

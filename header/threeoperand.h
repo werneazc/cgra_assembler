@@ -28,6 +28,16 @@ namespace as
 // Forward declaration
 class Level;
 
+/**
+ * @class ThreeOperand
+ *
+ * @brief Parse object for VCGRA assembler commands with three operands.
+ *
+ * @details
+ * This parse object handles assembler commands with three operands like LOADD
+ * or STORED. It stores the machine code ID for the VCGRA command parser as
+ * well as three pointers to the operands.
+ */
 class ThreeOperand : public ParseObjBase, public IAssemble
 {
   public:
@@ -183,13 +193,13 @@ class ThreeOperand : public ParseObjBase, public IAssemble
 
   private:
     ParseObjBase *m_first;
-    //!< @brief
+    //!< @brief Handle to first operand
     ParseObjBase *m_second;
-    //!< @brief
+    //!< @brief Handle to first operand
     ParseObjBase *m_third;
-    //!< @brief
+    //!< @brief Handle to first operand
     uint32_t m_machineCodeId;
-    //!< @brief
+    //!< @brief Machine code ID for VCGRA command parser.
 };
 
 } /* End namespace as */

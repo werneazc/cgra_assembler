@@ -36,7 +36,7 @@ class IAssemble
     /**
      * @brief Interface function to implement assemble functionality.
      *
-     * @param asA Assembler object containing VCGRA configuration parameter
+     * @param ptreeA Assembler object containing VCGRA configuration parameter
      *
      * @return std::string VCGRA machine code string.
      */

@@ -44,7 +44,7 @@ class Level;
  * \brief Handle and assemble VCGRA assembler to machine code.
  *
  * \details
- * #TODO: Add description.
+ * \todo: Add description.
  *
  */
 class Assembler
