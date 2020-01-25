@@ -72,7 +72,7 @@
             <MachineId>10</MachineId>
         </Operator>
     </TwoOperator>
-    <ThreeOperator>LOADD,STORED
+    <ThreeOperator>
         <Operator>
             <Name>LOADD</Name>
             <MachineId>5</MachineId>
@@ -82,7 +82,7 @@
             <MachineId>7</MachineId>
         </Operator>
     </ThreeOperator>
-    <ArithOperator>ADD,ADDI
+    <ArithOperator>
         <Operator>
             <Name>ADD</Name>
         </Operator>
