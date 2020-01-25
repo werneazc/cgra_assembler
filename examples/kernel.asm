@@ -24,11 +24,11 @@ LOOP 0 9 1
 POOL
 #Iterate over left input values
 LOOP 9 512 18
-    SLT_DOC_LINE 0
+    SLCT_DOC_LINE 0
     START
 #Load values to VCGRA
     VAR place 1
-    SLT_DIC_LINE 1
+    SLCT_DIC_LINE 1
     LOOP 0 9 1
         LOADD iaddr 1 place
         ADDI iaddr 2
@@ -36,10 +36,10 @@ LOOP 9 512 18
     POOL
     WAIT_READY
     STORED oaddr 0 0
-    SLT_DOC_LINE 1
+    SLCT_DOC_LINE 1
     START
     ADDI oaddr 2
-    SLT_DIC_LINE 0
+    SLCT_DIC_LINE 0
     VAR place 1
     LOOP 0 9 1
         LOADD iaddr 0 place
