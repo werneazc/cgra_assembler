@@ -101,4 +101,12 @@ class AddInteger : public IArithmetic, public ParseObjBase
 
 } /* End namespace as */
 
+/**
+ * @brief Dump information about add-operand instance
+ *
+ * @param[in] osA   Output stream to write to
+ * @param[in] opA   Reference to add-integer operand that shall be dumped
+ */
+std::ostream& operator<<(std::ostream& osA, const as::AddInteger& opA);
+
 #endif // ADDINTEGER_H

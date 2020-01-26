@@ -20,6 +20,7 @@
 #include "parseobjectconst.h"
 #include "parseobjectvariable.h"
 #include <utility>
+#include <array>
 
 namespace as
 {
@@ -94,3 +95,42 @@ void AddInteger::clearMembers()
 }
 
 } /* End namespace as */
+
+std::ostream &operator<<(std::ostream &osA, const as::AddInteger &opA)
+{
+    osA << static_cast<const as::ParseObjBase &>(opA) << "; ";
+
+    std::array<const as::ParseObjBase *, 2> t_op{opA.getFirst(), opA.getSecond()};
+
+    bool first{true};
+
+    for (auto op : t_op)
+        {
+            if (first)
+                {
+                    osA << "first: ";
+                    first = false;
+                }
+            else
+                {
+                    osA << "second: ";
+                }
+
+            if (op->getCommandClass() == as::COMMANDCLASS::CONSTANT)
+                {
+                    osA << *(static_cast<const as::ParseObjectConst *>(op));
+                }
+            else if (op->getCommandClass() == as::COMMANDCLASS::VARIABLE)
+                {
+                    osA << *(static_cast<const as::ParseObjectVariable *>(op));
+                }
+            else
+                {
+                    osA << *op;
+                }
+
+            osA << "; ";
+        }
+
+    return osA;
+}
