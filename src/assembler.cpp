@@ -16,6 +16,8 @@
  */
 
 #include "assembler.h"
+#include "add.h"
+#include "addinteger.h"
 #include "loop.h"
 #include "myException.h"
 #include "nooperand.h"
@@ -72,6 +74,111 @@ bool is_number(const std::string &strA)
         }
 
     return t_status;
+}
+
+/** @brief Structure for creating a list of references for createTwoOpParseObj function */
+typedef struct
+{
+    std::array<std::string, 2> &Ops; //!< @brief Reference to array of operands
+    uint16_t &count;                 //!< @brief Reference to the line counter
+    std::string &command;            //!< @brief Reference to the command string
+    const std::string &match;        //!< @brief reference to the line match string
+    const uint8_t &machineId;        //!< @brief Reference to machine ID (unused for arithmetic operations)
+    const char *const &op_type;      //!< @brief Reference to latest operator type
+    boost::smatch &commandMatch;     //!< @brief Reference to match object for two operand commands
+} createTwoOpParseObjParam_t;
+
+/**
+ * @brief Get two parse object from latest parameter set
+ *
+ * @param paramA        Parameter set
+ * @return Two-operand or arithmetic parse object
+ */
+as::ParseObjBase *createTwoOpParseObj(createTwoOpParseObjParam_t &paramA)
+{
+
+    as::ParseObjBase *t_parseObj(nullptr);
+    as::ParseObjBase *t_first{nullptr};
+    as::ParseObjBase *t_second{nullptr};
+    bool firstOp{true};
+
+    for (const auto &op : paramA.Ops)
+        {
+            auto t_op = as::Level::getCurrentLevel()->findParseObj(op);
+
+            if (!t_op)
+                {
+                    if (std::find_if(op.begin(), op.end(), [](unsigned char c) { return !std::isdigit(c); }) !=
+                        op.end())
+                        {
+                            std::ostringstream t_msg{""};
+                            t_msg << "Syntax error line " << paramA.count << ". Unknown variable." << std::endl;
+                            throw as::AssemblerException(t_msg.str(), 1051);
+                        }
+                    else
+                        {
+                            auto t_parseObj = new as::ParseObjectConst(op, std::stoi(op), as::Level::getCurrentLevel(),
+                                                                       paramA.commandMatch[0].str(), paramA.count);
+                            as::Level::getCurrentLevel()->addParseObj(t_parseObj);
+
+                            t_op = t_parseObj;
+                        }
+                }
+
+            if (firstOp)
+                {
+                    t_first = t_op;
+                    firstOp = false;
+                }
+            else
+                {
+                    t_second = t_op;
+                }
+        }
+
+    if (std::strcmp(paramA.op_type, "TwoOperator") == 0)
+        {
+            t_parseObj = new as::TwoOperand(as::Level::getCurrentLevel(), paramA.match, paramA.count, t_first, t_second,
+                                            paramA.machineId);
+
+            // Show properties of variable for debugging
+            std::cout << *static_cast<as::TwoOperand *>(t_parseObj) << "\n";
+        }
+    else
+        {
+            if (std::strcmp(paramA.command.c_str(), "ADD") == 0)
+                {
+                    t_parseObj =
+                        new as::Add(as::Level::getCurrentLevel(), paramA.match, paramA.count, t_first, t_second);
+
+                    // Show properties of variable for debugging
+                    std::cout << *static_cast<as::Add *>(t_parseObj) << "\n";
+                }
+            else if (std::strcmp(paramA.command.c_str(), "ADDI") == 0)
+                {
+                    if (t_second->getCommandClass() == as::COMMANDCLASS::CONSTANT)
+                        {
+                            t_parseObj = new as::AddInteger(as::Level::getCurrentLevel(), paramA.match, paramA.count,
+                                                            t_first, t_second);
+                            // Show properties of variable for debugging
+                            std::cout << *static_cast<as::AddInteger*>(t_parseObj) << "\n";
+                        }
+                    else
+                        {
+                            std::ostringstream t_msg{""};
+                            t_msg << "Value error line " << paramA.count
+                                  << ". Second Argument for ADDI is not a constant." << std::endl;
+                            throw as::AssemblerException(t_msg.str(), 1058);
+                        }
+                }
+            else
+                {
+                    std::ostringstream t_msg{""};
+                    t_msg << "Command error line " << paramA.count << ". Unknown command." << std::endl;
+                    throw as::AssemblerException(t_msg.str(), 1059);
+                }
+        }
+    return t_parseObj;
 }
 
 } // End anonymous namespace
@@ -433,81 +540,33 @@ void Assembler::parse(void)
 
                                                             if (vec.first == t_command)
                                                                 {
-                                                                    as::ParseObjBase *t_first{nullptr};
-                                                                    as::ParseObjBase *t_second{nullptr};
-                                                                    bool firstOp{true};
 
-                                                                    for (const auto &op : t_Ops)
-                                                                        {
-                                                                            auto t_op = as::Level::getCurrentLevel()
-                                                                                            ->findParseObj(op);
+                                                                    createTwoOpParseObjParam_t t_param{
+                                                                        .Ops = t_Ops,
+                                                                        .count = t_count,
+                                                                        .command = t_command,
+                                                                        .match = t_match,
+                                                                        .machineId = vec.second,
+                                                                        .op_type = op_type,
+                                                                        .commandMatch = t_commandMatch,
+                                                                    };
 
-                                                                            if (!t_op)
-                                                                                {
-                                                                                    if (std::find_if(
-                                                                                            op.begin(), op.end(),
-                                                                                            [](unsigned char c) {
-                                                                                                return !std::isdigit(c);
-                                                                                            }) != op.end())
-                                                                                        {
-                                                                                            std::ostringstream t_msg{
-                                                                                                ""};
-                                                                                            t_msg
-                                                                                                << "Syntax error line "
-                                                                                                << t_count
-                                                                                                << ". Unknown variable."
-                                                                                                << std::endl;
-                                                                                            throw AssemblerException(
-                                                                                                t_msg.str(), 1051);
-                                                                                        }
-                                                                                    else
-                                                                                        {
-                                                                                            auto t_parseObj = new as::
-                                                                                                ParseObjectConst(
-                                                                                                    op, std::stoi(op),
-                                                                                                    as::Level::
-                                                                                                        getCurrentLevel(),
-                                                                                                    t_commandMatch[0]
-                                                                                                        .str(),
-                                                                                                    t_count);
-                                                                                            as::Level::getCurrentLevel()
-                                                                                                ->addParseObj(
-                                                                                                    t_parseObj);
+                                                                    as::ParseObjBase *t_parseObj =
+                                                                        createTwoOpParseObj(t_param);
 
-                                                                                            t_op = t_parseObj;
-                                                                                        }
-                                                                                }
+                                                                    // At parse object to current level
+                                                                    as::Level::getCurrentLevel()->addParseObj(
+                                                                        t_parseObj);
 
-                                                                            if (firstOp)
-                                                                                {
-                                                                                    t_first = t_op;
-                                                                                    firstOp = false;
-                                                                                }
-                                                                            else
-                                                                                {
-                                                                                    t_second = t_op;
-                                                                                }
-                                                                        }
-
-                                                                    if (std::strcmp(op_type, "TwoOperator") == 0)
-                                                                        {
-                                                                            auto t_parseObj = new as::TwoOperand(
-                                                                                as::Level::getCurrentLevel(), t_match,
-                                                                                t_count, t_first, t_second, vec.second);
-
-                                                                            // Show properties of variable for debugging
-                                                                            std::cout << *t_parseObj << "\n";
-                                                                        }
-                                                                    else
-                                                                        {
-                                                                            // TODO: Add code for arithmetic types
-                                                                        }
-                                                                    
                                                                     found = true;
 
-                                                                    break;
+                                                                    break; // Stop loop over commands for operater class
                                                                 }
                                                         }
+                                                }
+                                            else
+                                                {
+                                                    break; // Stop loop over operator classes
                                                 }
                                         }
                                 }
