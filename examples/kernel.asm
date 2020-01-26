@@ -1,3 +1,12 @@
+#Load configuration
+CONST pcaddr 4096
+CONST ccaddr 6144
+SLCT_PECC_LINE 1
+SLCT_CHCC_LINE 1
+LOADCC ccaddr 0
+LOADPC pcaddr 0
+SLCT_PECC_LINE 0
+SLCT_CHCC_LINE 0
 #Kernel of a 3x3 Convolution
 VAR iaddr 0
 VAR oaddr 2048
