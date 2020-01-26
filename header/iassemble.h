@@ -42,6 +42,21 @@ class IAssemble
      */
     virtual std::string assemble(const boost::property_tree::ptree &ptreeA) = 0;
 
+    /**
+     * @brief Get ID for machine code of VCGRA command parser.
+     *
+     * @return Copy of stored machine code ID.
+     */
+    virtual uint32_t getMachineCodeId(void) const = 0;
+
+    /**
+     * @brief Set new machine code ID.
+     *
+     * @param machineIdA New machine code ID to store.
+     * @return Previous machine code ID.
+     */
+    virtual uint32_t setMachineCodeId(const uint32_t machineIdA) = 0;
+
     // Member variables:
     boost::format m_fmtStr{"0x%1$04X%2$04X"};
     //!< @brief Format string for machine code format.

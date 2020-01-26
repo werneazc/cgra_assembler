@@ -185,7 +185,7 @@ uint32_t as::OneOperand::getMachineCodeId() const
     return m_machineCodeId;
 }
 
-uint32_t as::OneOperand::setMachinenCodeId(const uint32_t machineIdA)
+uint32_t as::OneOperand::setMachineCodeId(const uint32_t machineIdA)
 {
     auto t_val = this->m_machineCodeId;
     this->m_machineCodeId = machineIdA;

@@ -168,7 +168,7 @@ class ThreeOperand : public ParseObjBase, public IAssemble
      *
      * @return Machine code ID.
      */
-    uint32_t getMachineCodeId(void) const;
+    virtual uint32_t getMachineCodeId(void) const override;
 
     /**
      * @brief Set new machine code ID
@@ -176,7 +176,7 @@ class ThreeOperand : public ParseObjBase, public IAssemble
      * @param machineIdA New machine code ID.
      * @return Previous machine code ID.
      */
-    uint32_t setMachineCodeId(const uint32_t machineIdA);
+    virtual uint32_t setMachineCodeId(const uint32_t machineIdA) override;
 
     /**
      * @brief Reset all object members.

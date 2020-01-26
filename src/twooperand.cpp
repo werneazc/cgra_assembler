@@ -124,7 +124,7 @@ uint32_t as::TwoOperand::getMachineCodeId() const
     return m_machineCodeId;
 }
 
-uint32_t as::TwoOperand::setMachinenCodeId(const uint32_t machineIdA)
+uint32_t as::TwoOperand::setMachineCodeId(const uint32_t machineIdA)
 {
     auto t_val = this->m_machineCodeId;
     this->m_machineCodeId = machineIdA;
