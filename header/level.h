@@ -171,6 +171,24 @@ class Level
      */
     static Level *getCurrentLevel(void);
 
+    /**
+     * @brief Return iterator over child levels
+     */
+    std::vector<Level *>::iterator begin();
+    /**
+     * @brief Return iterator over child levels
+     */
+    std::vector<Level *>::iterator end();
+
+    /**
+     * @brief Return iterator over child levels
+     */
+    std::vector<Level *>::const_iterator cbegin() const;
+    /**
+     * @brief Return iterator over child levels
+     */
+    std::vector<Level *>::const_iterator cend() const;
+
   private:
     // Forbidden constructors
     Level(const Level &src) = delete;
