@@ -18,13 +18,11 @@
 #ifndef IARITHMETIC_H
 #define IARITHMETIC_H
 
+#include "parseobjbase.h"
 #include <utility>
 
 namespace as
 {
-
-// Forward declarations
-class ParseObjBase;
 
 /**
  * @interface IArithmetic
@@ -35,7 +33,7 @@ class ParseObjBase;
  * Pure virtual function 'processOperation' needs to be defined in arithmetic
  * operation classes for a specific operation.
  */
-class IArithmetic
+class IArithmetic : public ParseObjBase
 {
   public:
     typedef std::pair<ParseObjBase *const, ParseObjBase *const> operator_type_t;
@@ -49,11 +47,15 @@ class IArithmetic
     /**
      * @brief General constructor
      *
+     * @param[in,out] lvlA Level where the parsed object is defined.
+     * @param[in] cmdLineA Assembler command line as a string.
+     * @param[in] lineNumberA Line number of assembler file where the parse object is defined.
      * @param[in] firstA Ptr. to first element of arithmetic operation; stores also result of operation.
      * @param[in] secondA Ptr. to second element of arithmetic operation.
      */
 
-    IArithmetic(ParseObjBase *const firstA, ParseObjBase *const secondA);
+    IArithmetic(Level *lvlA, const std::string &cmdLineA, const uint32_t &lineNumberA, ParseObjBase *const firstA,
+                ParseObjBase *const secondA);
     /**
      * @brief Copy constructor
      *

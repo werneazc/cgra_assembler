@@ -19,29 +19,27 @@
 #include "myException.h"
 #include "parseobjectconst.h"
 #include "parseobjectvariable.h"
-#include <utility>
 #include <array>
+#include <utility>
 
 namespace as
 {
 
 AddInteger::AddInteger(Level *lvlA, const std::string &cmdLineA, const uint32_t &lineNumberA, ParseObjBase *firstA,
                        ParseObjBase *secondA)
-    : IArithmetic{firstA, secondA}, ParseObjBase{lvlA, COMMANDCLASS::ARITHMETIC, cmdLineA, lineNumberA}
+    : IArithmetic{lvlA, cmdLineA, lineNumberA, firstA, secondA}
 {
     return;
 }
 
 AddInteger::AddInteger(const AddInteger &srcA)
-    : IArithmetic{srcA.getFirst(), srcA.getSecond()}, ParseObjBase{srcA.getLevel(), srcA.getCommandClass(),
-                                                                   srcA.getReadCmdLine(), srcA.getFileLineNumber()}
+    : IArithmetic{srcA.getLevel(), srcA.getReadCmdLine(), srcA.getFileLineNumber(), srcA.getFirst(), srcA.getSecond()}
 {
     return;
 }
 
 AddInteger::AddInteger(AddInteger &&srcA)
-    : IArithmetic{srcA.getFirst(), srcA.getSecond()}, ParseObjBase{srcA.getLevel(), srcA.getCommandClass(),
-                                                                   srcA.getReadCmdLine(), srcA.getFileLineNumber()}
+    : IArithmetic{srcA.getLevel(), srcA.getReadCmdLine(), srcA.getFileLineNumber(), srcA.getFirst(), srcA.getSecond()}
 {
     srcA.clearMembers();
 

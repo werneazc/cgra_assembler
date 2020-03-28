@@ -29,7 +29,7 @@ namespace as
  *
  * @brief arithmetic operation to add a constand value to a variable.
  */
-class AddInteger : public IArithmetic, public ParseObjBase
+class AddInteger : public IArithmetic
 {
   public:
     /**
@@ -107,6 +107,6 @@ class AddInteger : public IArithmetic, public ParseObjBase
  * @param[in] osA   Output stream to write to
  * @param[in] opA   Reference to add-integer operand that shall be dumped
  */
-std::ostream& operator<<(std::ostream& osA, const as::AddInteger& opA);
+std::ostream &operator<<(std::ostream &osA, const as::AddInteger &opA);
 
 #endif // ADDINTEGER_H

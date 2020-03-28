@@ -16,22 +16,29 @@
  */
 
 #include "iarithmetic.h"
+#include "level.h"
+#include <cstdint>
 
 namespace as
 {
 
-IArithmetic::IArithmetic() : IArithmetic{nullptr, nullptr}
+IArithmetic::IArithmetic() : IArithmetic{nullptr, "", UINT32_MAX, nullptr, nullptr}
 {
     return;
 }
 
-IArithmetic::IArithmetic(ParseObjBase *const firstA, ParseObjBase *const secondA) : m_first{firstA}, m_second{secondA}
+IArithmetic::IArithmetic(Level *lvlA, const std::string &cmdLineA, const uint32_t &lineNumberA,
+                         ParseObjBase *const firstA, ParseObjBase *const secondA)
+    : ParseObjBase(lvlA, COMMANDCLASS::ARITHMETIC, cmdLineA, lineNumberA), m_first{firstA}, m_second{secondA}
 {
     return;
 }
 
 IArithmetic &IArithmetic::operator=(IArithmetic &&src)
 {
+
+    static_cast<ParseObjBase>(*this) = std::move(static_cast<ParseObjBase>(src));
+
     m_first = src.m_first;
     m_first = nullptr;
     m_second = src.m_second;
@@ -42,22 +49,28 @@ IArithmetic &IArithmetic::operator=(IArithmetic &&src)
 
 IArithmetic &IArithmetic::operator=(const IArithmetic &src)
 {
+
+    static_cast<ParseObjBase>(*this) = static_cast<ParseObjBase>(src);
+
     m_first = src.m_first;
     m_second = src.m_second;
 
     return *this;
 }
 
-IArithmetic::IArithmetic(IArithmetic &&src) : IArithmetic{src.m_first, src.m_second}
+IArithmetic::IArithmetic(IArithmetic &&src)
+    : ParseObjBase(src.getLevel(), COMMANDCLASS::ARITHMETIC, src.getReadCmdLine(), src.getFileLineNumber()),
+      m_first(src.getFirst()), m_second(src.getSecond())
 {
-    src.m_first = nullptr;
-    src.m_second = nullptr;
-
     return;
 }
 
-IArithmetic::IArithmetic(const as::IArithmetic &src) : IArithmetic{src.m_first, src.m_second}
+IArithmetic::IArithmetic(const as::IArithmetic &src)
+    : ParseObjBase(src.getLevel(), COMMANDCLASS::ARITHMETIC, src.getReadCmdLine(), src.getFileLineNumber()),
+      m_first(src.getFirst()), m_second(src.getSecond())
 {
+    *this = src;
+
     return;
 }
 

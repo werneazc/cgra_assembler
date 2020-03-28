@@ -19,28 +19,26 @@
 #include "myException.h"
 #include "parseobjectconst.h"
 #include "parseobjectvariable.h"
-#include <utility>
 #include <array>
+#include <utility>
 
 namespace as
 {
 Add::Add(Level *lvlA, const std::string &cmdLineA, const uint32_t lineNumberA, ParseObjBase *const firstA,
          ParseObjBase *const secondA)
-    : ParseObjBase{lvlA, COMMANDCLASS::ARITHMETIC, cmdLineA, lineNumberA}, IArithmetic{firstA, secondA}
+    : IArithmetic{lvlA, cmdLineA, lineNumberA, firstA, secondA}
 {
     return;
 }
 
 Add::Add(const Add &srcA)
-    : ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(), srcA.getFileLineNumber()},
-      IArithmetic{srcA.getFirst(), srcA.getSecond()}
+    : IArithmetic{srcA.getLevel(), srcA.getReadCmdLine(), srcA.getFileLineNumber(), srcA.getFirst(), srcA.getSecond()}
 {
     return;
 }
 
 Add::Add(Add &&srcA)
-    : ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(), srcA.getFileLineNumber()},
-      IArithmetic{srcA.getFirst(), srcA.getSecond()}
+    : IArithmetic{srcA.getLevel(), srcA.getReadCmdLine(), srcA.getFileLineNumber(), srcA.getFirst(), srcA.getSecond()}
 {
     srcA.clearMembers();
     return;
@@ -90,7 +88,7 @@ bool Add::processOperation(void)
 
 } /* End namespace as */
 
-std::ostream& operator<<(std::ostream& osA, const as::Add& opA)
+std::ostream &operator<<(std::ostream &osA, const as::Add &opA)
 {
     osA << static_cast<const as::ParseObjBase &>(opA) << "; ";
 
