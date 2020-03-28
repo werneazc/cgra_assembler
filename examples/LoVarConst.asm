@@ -5,8 +5,9 @@ LOOP 0 5 1
     LOOP 0 myConst myVar
         ADDI myVar2 2
         SLCT_DIC_LINE 0
-        LOADPC myConst 2
-        LOADCC 80 myVar
+        LOADPC myConst 1
+        LOADCC myVar2 0
     POOL
 POOL
-LOADD myVar 0 181
+LOADD myVar 0 2
+FINISH

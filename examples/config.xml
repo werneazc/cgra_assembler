@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <General>
-    <Output>./program.vmc</Output>
+    <Output>./Assembler.hpp</Output>
 </General>
 
 <VCGRA_Property>
-    <Available_Memory>4096</Available_Memory>
+    <Available_Memory>8192</Available_Memory>
     <Num_Dic_Lines>2</Num_Dic_Lines>
     <Num_Dic_Places>8</Num_Dic_Places>
     <Num_Doc_Lines>2</Num_Doc_Lines>
