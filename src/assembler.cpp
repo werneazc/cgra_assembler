@@ -214,7 +214,7 @@ Assembler::Assembler(boost::filesystem::path &filePathA, boost::property_tree::p
     // Store filename to variable
     m_outFileName = m_outPath.filename();
     // Validate file extension.
-    if (m_outFileName.extension() != ".vmc")
+    if (m_outFileName.extension() != ".hpp")
         throw as::AssemblerException("Output file has wrong file extension. Expected extension \".vmc\"", 1001);
 
     Level::setCurrentLevel(m_firstLevel);
@@ -668,40 +668,63 @@ void Assembler::assemble(void)
     m_log << "\nStart assembling code" << std::endl;
     m_log << "---------------------" << std::endl;
 
-    uint64_t lvlId{0};
+    //Opening file to store machine code.
+    std::filebuf t_fb;
 
-    for (auto po : m_firstLevel->getParseObjList())
-        {
-            switch (po->getCommandClass())
-                {
-                case as::COMMANDCLASS::ARITHMETIC:
-                    static_cast<as::IArithmetic *>(po)->processOperation();
-                    break;
-                case as::COMMANDCLASS::NOOPERAND:
-                    m_log << static_cast<as::NoOperand *>(po)->assemble(m_config);
-                    m_log << std::endl;
-                    break;
-                case as::COMMANDCLASS::ONEOPERAND:
-                    m_log << static_cast<as::OneOperand *>(po)->assemble(m_config);
-                    m_log << std::endl;
-                    break;
-                case as::COMMANDCLASS::TWOOPERAND:
-                    m_log << static_cast<as::TwoOperand *>(po)->assemble(m_config);
-                    m_log << std::endl;
-                    break;
-                case as::COMMANDCLASS::THREEOPERAND:
-                    m_log << static_cast<as::ThreeOperand *>(po)->assemble(m_config);
-                    m_log << std::endl;
-                    break;
-                case as::COMMANDCLASS::LOOP:
-                    static_cast<Loop *>(m_firstLevel->at(lvlId++))->assemble(m_config, m_log);
-                    break;
-                case as::COMMANDCLASS::CONSTANT:
-                case as::COMMANDCLASS::VARIABLE:
-                default:
-                    break;
-                }
-        }
+    if(t_fb.open(m_outPath.c_str(), std::ios::out))
+    {
+        std::ostream t_codeFile(&t_fb);
+
+        t_codeFile << "#ifndef " << std::uppercase << m_outFileName.stem().string() << "_H_\n";
+        t_codeFile << "#define " << std::uppercase << m_outFileName.stem().string() << "_H_\n\n\n";
+
+        t_codeFile << "const cgra::TopLevel::assembler_type_t assembler[] = {\n";
+
+        uint64_t lvlId{0};
+
+        for (auto po : m_firstLevel->getParseObjList())
+            {
+                switch (po->getCommandClass())
+                    {
+                    case as::COMMANDCLASS::ARITHMETIC:
+                        static_cast<as::IArithmetic *>(po)->processOperation();
+                        break;
+                    case as::COMMANDCLASS::NOOPERAND:
+                        t_codeFile << static_cast<as::NoOperand *>(po)->assemble(m_config);
+                        t_codeFile << "," << std::endl;
+                        break;
+                    case as::COMMANDCLASS::ONEOPERAND:
+                        t_codeFile << static_cast<as::OneOperand *>(po)->assemble(m_config);
+                        t_codeFile << "," << std::endl;
+                        break;
+                    case as::COMMANDCLASS::TWOOPERAND:
+                        t_codeFile << static_cast<as::TwoOperand *>(po)->assemble(m_config);
+                        t_codeFile << "," << std::endl;
+                        break;
+                    case as::COMMANDCLASS::THREEOPERAND:
+                        t_codeFile << static_cast<as::ThreeOperand *>(po)->assemble(m_config);
+                        t_codeFile << "," << std::endl;
+                        break;
+                    case as::COMMANDCLASS::LOOP:
+                        static_cast<Loop *>(m_firstLevel->at(lvlId++))->assemble(m_config, t_codeFile);
+                        break;
+                    case as::COMMANDCLASS::CONSTANT:
+                    case as::COMMANDCLASS::VARIABLE:
+                    default:
+                        break;
+                    }
+            }
+
+        t_codeFile << "};\n\n";
+        t_codeFile << "#endif //" << std::uppercase << m_outFileName.stem().string() << "_H_\n";
+        t_fb.close();
+    }
+    else
+    {
+        throw AssemblerException("Error while opening output file.", 4500);
+    }
+
+    m_log << "Machine operation code successfully stored at " << m_outPath << std::endl;
 
     return;
 }
