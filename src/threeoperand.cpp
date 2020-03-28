@@ -171,17 +171,16 @@ std::string as::ThreeOperand::assemble(const boost::property_tree::ptree &ptreeA
     uint32_t t_countVal{0};            // Counter to select write property for available cache lines
     uint32_t t_valFirst{0}, t_valSecond{0}, t_valThird{0}; // Parameter value of command
 
-    /*#TODO: This separates the values of configuration file parameter "TwoOperator" is a list.
+    /*#TODO: This separates the values of configuration file parameter "TwoOperator" in a list.
      * It seems, that the ordering of the values depends on the order in the configuration file.
      * Thus, reading out the write properties for cache line size needs to be updated for an independent order.
      */
-    auto t_opt = boost::tokenizer<boost::escaped_list_separator<char>>(
-        ptreeA.get<std::string>("Assembler_Property.ThreeOperator"));
+    auto t_opt = ptreeA.get_child("Assembler_Property.ThreeOperator");
 
     // Search for parameter of available cache lines for actual command
     for (const auto &opt : t_opt)
         {
-            if (ptreeA.get<uint32_t>(opt) == m_machineCodeId)
+            if (opt.second.get<uint32_t>("MachineId") == m_machineCodeId)
                 {
                     switch (t_countVal)
                         {
@@ -243,7 +242,7 @@ std::string as::ThreeOperand::assemble(const boost::property_tree::ptree &ptreeA
             t_valSecond |= m_machineCodeId;
         }
     else
-        throw as::AssemblerException("Selected cache line is not available.", 8815);
+        throw as::AssemblerException("Selected cache line is not available or address is out of memory.", 8815);
 
     t_os << "\"" << m_fmtStr % t_valFirst % t_valSecond << "\"";
 

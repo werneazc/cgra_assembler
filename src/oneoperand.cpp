@@ -99,17 +99,17 @@ std::string as::OneOperand::assemble(const boost::property_tree::ptree &ptreeA)
     uint32_t t_countVal{0};            // Counter to select write property for available cache lines
     uint32_t t_val{0};                 // Parameter value of command
 
-    /*#TODO: This separates the values of configuration file parameter "OneOperator" is a list.
+    /*#TODO: This separates the values of configuration file parameter "OneOperator" in a list.
      * It seems, that the ordering of the values depends on the order in the configuration file.
      * Thus, reading out the write properties for cache line size needs to be updated for an independent order.
      */
-    auto t_opt = boost::tokenizer<boost::escaped_list_separator<char>>(
-        ptreeA.get<std::string>("Assembler_Property.OneOperator"));
+    auto t_opt = ptreeA.get_child("Assembler_Property.OneOperator");
 
     // Search for parameter of available cache lines for actual command
     for (const auto &opt : t_opt)
         {
-            if (ptreeA.get<uint32_t>(opt) == m_machineCodeId)
+
+            if (opt.second.get<uint32_t>("MachineId") == m_machineCodeId)
                 {
                     switch (t_countVal)
                         {
