@@ -22,6 +22,7 @@
 #include "level.h"
 #include <boost/property_tree/ptree.hpp>
 #include <cstdint>
+#include <iostream>
 
 namespace as
 {

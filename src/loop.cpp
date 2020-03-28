@@ -124,6 +124,9 @@ bool Loop::updateLoopIndex(void)
 
 std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ostream &osA)
 {
+
+    uint64_t lvlId{0};
+
     while (updateLoopIndex())
         {
             for (auto po : this->getParseObjList())
@@ -149,17 +152,17 @@ std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ost
                             osA << static_cast<as::ThreeOperand *>(po)->assemble(ptreeA);
                             osA << std::endl;
                             break;
+                        case as::COMMANDCLASS::LOOP:
+                            static_cast<Loop *>(this->at(lvlId++))->assemble(ptreeA, osA);
+                            break;
                         case as::COMMANDCLASS::CONSTANT:
                         case as::COMMANDCLASS::VARIABLE:
                         default:
                             break;
                         }
                 }
-        }
 
-    for (auto &lvl : *this)
-        {
-            static_cast<Loop *>(lvl)->assemble(ptreeA, osA);
+            lvlId = 0;
         }
 
     return osA;

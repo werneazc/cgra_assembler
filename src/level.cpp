@@ -268,4 +268,9 @@ std::vector<Level *>::const_iterator Level::cend() const
     return m_childLvlVec.cend();
 }
 
+Level *Level::at(uint32_t lvlId) const
+{
+    return m_childLvlVec.at(lvlId);
+}
+
 } /* End namespace as */

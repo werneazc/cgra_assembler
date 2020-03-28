@@ -18,12 +18,15 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
-#include "parseobjbase.h"
 #include <cstdint>
+#include <string>
 #include <vector>
 
 namespace as
 {
+
+/** @brief Forward declaration of parse object base class */
+class ParseObjBase;
 
 /**
  * @class Level
@@ -188,6 +191,9 @@ class Level
      * @brief Return iterator over child levels
      */
     std::vector<Level *>::const_iterator cend() const;
+
+    /** @brief Get access to child level instance */
+    Level *at(uint32_t lvlId) const;
 
   private:
     // Forbidden constructors

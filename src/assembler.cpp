@@ -331,6 +331,11 @@ void Assembler::parse(void)
                                     ++t_countval;
                                 }
 
+                            // Add Loop start point to actual level
+                            auto t_pObj = new ParseObjBase(Level::getCurrentLevel(), COMMANDCLASS::LOOP,
+                                                           t_LineMatch[0].str(), t_count);
+                            Level::getCurrentLevel()->addParseObj(t_pObj);
+
                             // Create new level as a loop
                             Loop *t_loopPtr = new Loop(Loop::getCurrentLevel(), t_count, t_start, t_end, t_step,
                                                        t_LineMatch[0].str());
@@ -663,6 +668,8 @@ void Assembler::assemble(void)
     m_log << "\nStart assembling code" << std::endl;
     m_log << "---------------------" << std::endl;
 
+    uint64_t lvlId{0};
+
     for (auto po : m_firstLevel->getParseObjList())
         {
             switch (po->getCommandClass())
@@ -686,22 +693,14 @@ void Assembler::assemble(void)
                     m_log << static_cast<as::ThreeOperand *>(po)->assemble(m_config);
                     m_log << std::endl;
                     break;
+                case as::COMMANDCLASS::LOOP:
+                    static_cast<Loop *>(m_firstLevel->at(lvlId++))->assemble(m_config, m_log);
+                    break;
                 case as::COMMANDCLASS::CONSTANT:
                 case as::COMMANDCLASS::VARIABLE:
                 default:
                     break;
                 }
-        }
-
-    /*
-     * The ParseObject Vector does not contain any access to the loops. Thus, we cannot regenerate the rigth sequence of
-     * commands. I need to store more information for loops ... maybe a handle as a parse object, which calls the right
-     * loop. Same for arithmetic objects. Its also missing to iterate over all child levels.
-     */
-
-    for (auto &lvl : *Level::getCurrentLevel())
-        {
-            static_cast<Loop *>(lvl)->assemble(m_config, m_log);
         }
 
     return;

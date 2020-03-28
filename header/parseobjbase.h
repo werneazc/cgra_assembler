@@ -43,7 +43,8 @@ enum class COMMANDCLASS : uint8_t
     ONEOPERAND,   //!< @brief Assembler command with one operator
     TWOOPERAND,   //!< @brief Assembler command with two operators
     THREEOPERAND, //!< @brief Assembler command with three operators
-    ARITHMETIC    //!< @brief Assembler command with arithmetic operations
+    ARITHMETIC,   //!< @brief Assembler command with arithmetic operations
+    LOOP,         //!< @brief Identify position of a new loop in assembler sequence
 };
 
 /**
