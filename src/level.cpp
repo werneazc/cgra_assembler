@@ -248,23 +248,22 @@ void Level::addChildLevel(Level *const levelA)
         throw AssemblerException("Invalid level pointer for child level.", 4444);
 }
 
-std::vector<Level*>::iterator Level::begin()
+std::vector<Level *>::iterator Level::begin()
 {
     return m_childLvlVec.begin();
 }
- 
 
-std::vector<Level*>::iterator Level::end()
+std::vector<Level *>::iterator Level::end()
 {
     return m_childLvlVec.end();
 }
 
-std::vector<Level*>::const_iterator Level::cbegin() const
+std::vector<Level *>::const_iterator Level::cbegin() const
 {
     return m_childLvlVec.cbegin();
 }
 
-std::vector<Level*>::const_iterator Level::cend() const
+std::vector<Level *>::const_iterator Level::cend() const
 {
     return m_childLvlVec.cend();
 }

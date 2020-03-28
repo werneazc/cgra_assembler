@@ -20,6 +20,7 @@
 #define LOOP_H
 
 #include "level.h"
+#include <boost/property_tree/ptree.hpp>
 #include <cstdint>
 
 namespace as
@@ -97,6 +98,13 @@ class Loop : public Level
     {
         return m_currentValue;
     }
+
+    /**
+     * @brief Interface function to implement assemble functionality.
+     *
+     * @param ptreeA Assembler object containing VCGRA configuration parameter
+     */
+    std::ostream &assemble(const boost::property_tree::ptree &ptreeA, std::ostream &osA = std::cout);
 
   private:
     // Forbidden Constructors

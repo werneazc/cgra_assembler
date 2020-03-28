@@ -160,7 +160,7 @@ int main(int argc, char **argv)
                             std::ostream log_os(&fb);
                             as::Assembler myAs(filePtr, parsed_options, log_os);
                             myAs.parse();
-                            // myAs.assemble();
+                            myAs.assemble();
                             // myAs.writeVmcFile();
                             fb.close();
                         }
@@ -169,7 +169,7 @@ int main(int argc, char **argv)
                 {
                     as::Assembler myAs(filePtr, parsed_options);
                     myAs.parse();
-                    // myAs.assemble();
+                    myAs.assemble();
                     // myAs.writeVmcFile();
                 }
         }

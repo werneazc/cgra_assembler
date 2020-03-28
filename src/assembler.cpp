@@ -658,11 +658,55 @@ void Assembler::parse(void)
     return;
 }
 
-// void Assembler::assemble(void)
-// {
-//     return;
-// }
-//
+void Assembler::assemble(void)
+{
+    m_log << "\nStart assembling code" << std::endl;
+    m_log << "---------------------" << std::endl;
+
+    for (auto po : m_firstLevel->getParseObjList())
+        {
+            switch (po->getCommandClass())
+                {
+                case as::COMMANDCLASS::ARITHMETIC:
+                    static_cast<as::IArithmetic *>(po)->processOperation();
+                    break;
+                case as::COMMANDCLASS::NOOPERAND:
+                    m_log << static_cast<as::NoOperand *>(po)->assemble(m_config);
+                    m_log << std::endl;
+                    break;
+                case as::COMMANDCLASS::ONEOPERAND:
+                    m_log << static_cast<as::OneOperand *>(po)->assemble(m_config);
+                    m_log << std::endl;
+                    break;
+                case as::COMMANDCLASS::TWOOPERAND:
+                    m_log << static_cast<as::TwoOperand *>(po)->assemble(m_config);
+                    m_log << std::endl;
+                    break;
+                case as::COMMANDCLASS::THREEOPERAND:
+                    m_log << static_cast<as::ThreeOperand *>(po)->assemble(m_config);
+                    m_log << std::endl;
+                    break;
+                case as::COMMANDCLASS::CONSTANT:
+                case as::COMMANDCLASS::VARIABLE:
+                default:
+                    break;
+                }
+        }
+
+    /*
+     * The ParseObject Vector does not contain any access to the loops. Thus, we cannot regenerate the rigth sequence of
+     * commands. I need to store more information for loops ... maybe a handle as a parse object, which calls the right
+     * loop. Same for arithmetic objects. Its also missing to iterate over all child levels.
+     */
+
+    for (auto &lvl : *Level::getCurrentLevel())
+        {
+            static_cast<Loop *>(lvl)->assemble(m_config, m_log);
+        }
+
+    return;
+}
+
 // void Assembler::writeVmcFile()
 // {
 //

@@ -16,7 +16,12 @@
  */
 
 #include "loop.h"
+#include "iarithmetic.h"
 #include "myException.h"
+#include "nooperand.h"
+#include "oneoperand.h"
+#include "threeoperand.h"
+#include "twooperand.h"
 #include <utility>
 
 namespace as
@@ -115,6 +120,49 @@ bool Loop::updateLoopIndex(void)
             else
                 return true;
         }
+}
+
+std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ostream &osA)
+{
+    while (updateLoopIndex())
+        {
+            for (auto po : this->getParseObjList())
+                {
+                    switch (po->getCommandClass())
+                        {
+                        case as::COMMANDCLASS::ARITHMETIC:
+                            static_cast<as::IArithmetic *>(po)->processOperation();
+                            break;
+                        case as::COMMANDCLASS::NOOPERAND:
+                            osA << static_cast<as::NoOperand *>(po)->assemble(ptreeA);
+                            osA << std::endl;
+                            break;
+                        case as::COMMANDCLASS::ONEOPERAND:
+                            osA << static_cast<as::OneOperand *>(po)->assemble(ptreeA);
+                            osA << std::endl;
+                            break;
+                        case as::COMMANDCLASS::TWOOPERAND:
+                            osA << static_cast<as::TwoOperand *>(po)->assemble(ptreeA);
+                            osA << std::endl;
+                            break;
+                        case as::COMMANDCLASS::THREEOPERAND:
+                            osA << static_cast<as::ThreeOperand *>(po)->assemble(ptreeA);
+                            osA << std::endl;
+                            break;
+                        case as::COMMANDCLASS::CONSTANT:
+                        case as::COMMANDCLASS::VARIABLE:
+                        default:
+                            break;
+                        }
+                }
+        }
+
+    for (auto &lvl : *this)
+        {
+            static_cast<Loop *>(lvl)->assemble(ptreeA, osA);
+        }
+
+    return osA;
 }
 
 } /* End namespace as */

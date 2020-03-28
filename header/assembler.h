@@ -75,7 +75,7 @@ class Assembler
     /**
      * \brief Create machine code from parsed assembly file
      */
-    // void assemble(void);
+    void assemble(void);
 
     /**
      * \brief Write VCGRA machine code to output file.
