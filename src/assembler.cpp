@@ -161,7 +161,7 @@ as::ParseObjBase *createTwoOpParseObj(createTwoOpParseObjParam_t &paramA)
                             t_parseObj = new as::AddInteger(as::Level::getCurrentLevel(), paramA.match, paramA.count,
                                                             t_first, t_second);
                             // Show properties of variable for debugging
-                            std::cout << *static_cast<as::AddInteger*>(t_parseObj) << "\n";
+                            std::cout << *static_cast<as::AddInteger *>(t_parseObj) << "\n";
                         }
                     else
                         {
@@ -283,7 +283,7 @@ void Assembler::parse(void)
 
                     m_log << "Parsed Assembler line " << t_count << ": " << t_str << std::endl;
 
-                    if (t_str.front() == '#' || t_str.empty())
+                    if (t_str.front() == '#' || t_str.empty()) // Comment or empty line
                         {
                             ++t_count;
                             continue;
@@ -294,7 +294,7 @@ void Assembler::parse(void)
                             int32_t t_start{0};
                             int32_t t_end{0};
                             int32_t t_step{0};
-                            uint8_t t_countval{1};
+                            uint8_t t_countval{1}; // This counter iterates over group matches; 0 is whole match.
 
                             // Get start, end and step value value for Loop
                             for (int32_t *const val : {&t_start, &t_end, &t_step})
@@ -351,6 +351,14 @@ void Assembler::parse(void)
                             // Temporary variable to store value of assembler variable
                             int32_t t_value{0};
 
+                            if (std::isdigit(t_LineMatch[1].str().front()))
+                                {
+                                    std::ostringstream t_msg{""};
+                                    t_msg << "Syntax error line " << t_count << ". Variable name starts with number."
+                                          << std::endl;
+                                    throw AssemblerException(t_msg.str(), 1024);
+                                }
+
                             if (is_number(t_LineMatch[2].str()))
                                 {
                                     t_value = std::stoi(t_LineMatch[2]);
@@ -383,14 +391,6 @@ void Assembler::parse(void)
                                         }
                                 }
 
-                            if (std::isdigit(t_LineMatch[1].str().front()))
-                                {
-                                    std::ostringstream t_msg{""};
-                                    t_msg << "Syntax error line " << t_count << ". Variable name starts with number."
-                                          << std::endl;
-                                    throw AssemblerException(t_msg.str(), 1024);
-                                }
-
                             auto t_pvPtr = new ParseObjectVariable(
                                 t_LineMatch[1].str(), t_value, Level::getCurrentLevel(), t_LineMatch[0].str(), t_count);
 
@@ -407,6 +407,14 @@ void Assembler::parse(void)
                             // Temporary variable to store value of assembler variable
                             int32_t t_value{0};
 
+                            if (std::isdigit(t_LineMatch[1].str().front()))
+                                {
+                                    std::ostringstream t_msg{""};
+                                    t_msg << "Syntax error line " << t_count << ". Constant name starts with number."
+                                          << std::endl;
+                                    throw AssemblerException(t_msg.str(), 1027);
+                                }
+
                             if (is_number(t_LineMatch[2].str()))
                                 {
                                     t_value = std::stoi(t_LineMatch[2]);
@@ -417,14 +425,6 @@ void Assembler::parse(void)
                                     t_msg << "Syntax error line " << t_count << ". Constant value is not an integer."
                                           << std::endl;
                                     throw AssemblerException(t_msg.str(), 1026);
-                                }
-
-                            if (std::isdigit(t_LineMatch[1].str().front()))
-                                {
-                                    std::ostringstream t_msg{""};
-                                    t_msg << "Syntax error line " << t_count << ". Constant name starts with number."
-                                          << std::endl;
-                                    throw AssemblerException(t_msg.str(), 1027);
                                 }
 
                             auto t_pcPtr = new ParseObjectConst(t_LineMatch[1].str(), t_value, Level::getCurrentLevel(),
@@ -444,7 +444,7 @@ void Assembler::parse(void)
                             boost::smatch t_commandMatch{};
                             /*
                              * Sometimes the direct usage of t_LineMatch[0].str() did not work.
-                             * Thus, the parameter for regex search is directly copies into a string constant
+                             * Thus, the parameter for regex search is directly copied into a string constant
                              * to overcome this issue.
                              */
                             const std::string t_match = t_LineMatch[0].str();
