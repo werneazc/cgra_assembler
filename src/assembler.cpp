@@ -38,9 +38,9 @@
 namespace
 {
 
-const boost::regex c_eVariable("VAR\\s+(\\w+)\\s+(\\w+)\\s*$");
+const boost::regex c_eVariable("VAR\\s+(\\w+)\\s+([+-]?\\w+)\\s*$");
 //!< \brief Regular expression to parse a variable line
-const boost::regex c_eConstant("CONST\\s+(\\w+)\\s+(\\d+)\\s*$");
+const boost::regex c_eConstant("CONST\\s+(\\w+)\\s+(0x[[:xdigit:]]+|[+-]?[[:digit:]]+)\\s*$", boost::regex::extended);
 //!< \brief Regular expression to parse a constant line
 const boost::regex c_eLoop("LOOP\\s+(\\w+)\\s+(\\w+)\\s+(\\w+)\\s*$");
 //!< \brief Regular expression to parse a start line of a loop construct
@@ -64,12 +64,28 @@ const boost::regex c_eThree("\\s*(\\w+)\\s+(\\w+)\\s+(\\w+)\\s+(\\w+)");
 bool is_number(const std::string &strA)
 {
     bool t_status{true};
-    for (auto it = strA.cbegin(); it != strA.cend(); ++it)
+
+    if (strA.find("0x") != std::string::npos)
         {
-            if (!std::isdigit(*it))
+            for (auto it = strA.cbegin() + 2; it != strA.cend(); ++it)
                 {
-                    t_status = false;
-                    break;
+                    if (!std::isxdigit(*it))
+                        {
+                            t_status = false;
+                            break;
+                        }
+                }
+        }
+    else
+        {
+
+            for (auto it = strA.cbegin(); it != strA.cend(); ++it)
+                {
+                    if (!std::isdigit(*it) && *it != '+' && *it != '-')
+                        {
+                            t_status = false;
+                            break;
+                        }
                 }
         }
 
@@ -117,8 +133,9 @@ as::ParseObjBase *createTwoOpParseObj(createTwoOpParseObjParam_t &paramA)
                         }
                     else
                         {
-                            auto t_parseObj = new as::ParseObjectConst(op, std::stoi(op), as::Level::getCurrentLevel(),
-                                                                       paramA.commandMatch[0].str(), paramA.count);
+                            auto t_parseObj =
+                                new as::ParseObjectConst(op, std::stoi(op, nullptr, 0), as::Level::getCurrentLevel(),
+                                                         paramA.commandMatch[0].str(), paramA.count);
                             as::Level::getCurrentLevel()->addParseObj(t_parseObj);
 
                             t_op = t_parseObj;
@@ -302,7 +319,7 @@ void Assembler::parse(void)
 
                                     if (is_number(t_LineMatch[t_countval].str()))
                                         {
-                                            *val = std::stoi(t_LineMatch[t_countval].str());
+                                            *val = std::stoi(t_LineMatch[t_countval].str(), nullptr, 0);
                                         }
                                     else
                                         {
@@ -330,6 +347,10 @@ void Assembler::parse(void)
 
                                     ++t_countval;
                                 }
+
+                            if (t_step == 0)
+                                throw as::AssemblerException("Infinitive Loop, because stepwidth is set to zero.",
+                                                             1066);
 
                             // Add Loop start point to actual level
                             auto t_pObj = new ParseObjBase(Level::getCurrentLevel(), COMMANDCLASS::LOOP,
@@ -366,7 +387,7 @@ void Assembler::parse(void)
 
                             if (is_number(t_LineMatch[2].str()))
                                 {
-                                    t_value = std::stoi(t_LineMatch[2]);
+                                    t_value = std::stoi(t_LineMatch[2].str(), nullptr, 0);
                                 }
                             else
                                 {
@@ -422,7 +443,7 @@ void Assembler::parse(void)
 
                             if (is_number(t_LineMatch[2].str()))
                                 {
-                                    t_value = std::stoi(t_LineMatch[2]);
+                                    t_value = std::stoi(t_LineMatch[2].str(), nullptr, 0);
                                 }
                             else
                                 {
@@ -489,7 +510,7 @@ void Assembler::parse(void)
                                                                     else
                                                                         {
                                                                             auto t_parseObj = new as::ParseObjectConst(
-                                                                                op, std::stoi(op),
+                                                                                op, std::stoi(op, nullptr, 0),
                                                                                 as::Level::getCurrentLevel(),
                                                                                 t_commandMatch[0].str(), t_count);
                                                                             as::Level::getCurrentLevel()->addParseObj(
@@ -601,7 +622,7 @@ void Assembler::parse(void)
                                                             else
                                                                 {
                                                                     auto t_parseObj = new as::ParseObjectConst(
-                                                                        t_value, std::stoi(t_value),
+                                                                        t_value, std::stoi(t_value, nullptr, 0),
                                                                         as::Level::getCurrentLevel(),
                                                                         t_commandMatch[0].str(), t_count);
                                                                     as::Level::getCurrentLevel()->addParseObj(
