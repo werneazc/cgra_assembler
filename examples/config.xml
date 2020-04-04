@@ -89,5 +89,17 @@
         <Operator>
             <Name>ADDI</Name>
         </Operator>
+        <Operator>
+            <Name>SUB</Name>
+        </Operator>
+        <Operator>
+            <Name>SUBI</Name>
+        </Operator>
+        <Operator>
+            <Name>MUL</Name>
+        </Operator>
+        <Operator>
+            <Name>MULI</Name>
+        </Operator>
     </ArithOperator>
 </Assembler_Property>
