@@ -76,13 +76,27 @@ void Add::clearMembers(void)
 bool Add::processOperation(void)
 {
     auto t_first = dynamic_cast<ParseObjectVariable *const>(this->getFirst());
-    auto t_second = dynamic_cast<ParseObjectVariable *const>(this->getSecond());
+    auto t_cmdClass = this->getSecond()->getCommandClass();
 
-    if (!(t_first && t_second))
+    if (!t_first)
         throw AssemblerException("Error Addition: One of the operands is not a variable type", 8525);
     else
-        t_first->setVariableValue(t_first->getVariableValue() + t_second->getVariableValue());
-
+        {
+            if (t_cmdClass == as::COMMANDCLASS::CONSTANT)
+                {
+                    auto t_second = dynamic_cast<as::ParseObjectConst *const>(this->getSecond());
+                    t_first->setVariableValue(t_first->getVariableValue() + t_second->getConstValue());
+                }
+            else if (t_cmdClass == as::COMMANDCLASS::VARIABLE)
+                {
+                    auto t_second = dynamic_cast<as::ParseObjectVariable *const>(this->getSecond());
+                    t_first->setVariableValue(t_first->getVariableValue() + t_second->getVariableValue());
+                }
+            else
+                {
+                    throw AssemblerException("Error Addition: One of the operands is not a variable type", 8525);
+                }
+        }
     return true;
 }
 
