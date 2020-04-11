@@ -222,9 +222,9 @@ std::string as::ThreeOperand::assemble(const boost::property_tree::ptree &ptreeA
         Expected constant integer value or integer variable for second operator",
                                      8814);
     // Get value of third parameter (place)
-    if (m_second->getCommandClass() == as::COMMANDCLASS::CONSTANT)
+    if (m_third->getCommandClass() == as::COMMANDCLASS::CONSTANT)
         t_valThird = static_cast<as::ParseObjectConst *>(this->m_third)->getConstValue();
-    else if (m_second->getCommandClass() == as::COMMANDCLASS::VARIABLE)
+    else if (m_third->getCommandClass() == as::COMMANDCLASS::VARIABLE)
         t_valThird = static_cast<as::ParseObjectVariable *>(this->m_third)->getVariableValue();
     else
         throw as::AssemblerException("Wrong parameter format for three-operation-command.\n \
