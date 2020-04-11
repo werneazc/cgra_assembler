@@ -32,6 +32,7 @@ add_library(parseobjects
         src/iarithmetic.cpp src/addinteger.cpp src/add.cpp src/sub.cpp src/subinteger.cpp
         src/mul.cpp src/mulinteger.cpp
         src/nooperand.cpp src/oneoperand.cpp src/twooperand.cpp src/threeoperand.cpp
+        src/resetvariable.cpp
     )
 target_include_directories(parseobjects
     PUBLIC
