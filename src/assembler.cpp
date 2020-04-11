@@ -26,6 +26,7 @@
 #include "oneoperand.h"
 #include "parseobjectconst.h"
 #include "parseobjectvariable.h"
+#include "resetvariable.h"
 #include "sub.h"
 #include "subinteger.h"
 #include "threeoperand.h"
@@ -471,8 +472,20 @@ void Assembler::parse(void)
                                         }
                                 }
 
-                            auto t_pvPtr = new ParseObjectVariable(
-                                t_LineMatch[1].str(), t_value, Level::getCurrentLevel(), t_LineMatch[0].str(), t_count);
+                            auto t_var = as::Level::getCurrentLevel()->findParseObj(t_LineMatch[1].str());
+                            as::ParseObjBase *t_pvPtr{nullptr};
+
+                            if (t_var)
+                                {
+                                    t_pvPtr = static_cast<as::ParseObjBase *>(new ResetVariable(
+                                        Level::getCurrentLevel(), t_LineMatch[0].str(), t_count, t_value, t_var));
+                                }
+                            else
+                                {
+                                    t_pvPtr = static_cast<as::ParseObjBase *>(
+                                        new ParseObjectVariable(t_LineMatch[1].str(), t_value, Level::getCurrentLevel(),
+                                                                t_LineMatch[0].str(), t_count));
+                                }
 
                             // At parse object to current level
                             Level::getCurrentLevel()->addParseObj(t_pvPtr);
@@ -753,6 +766,7 @@ void Assembler::assemble(void)
             t_codeFile << "#ifndef " << std::uppercase << m_outFileName.stem().string() << "_H_\n";
             t_codeFile << "#define " << std::uppercase << m_outFileName.stem().string() << "_H_\n\n\n";
 
+            t_codeFile << "namespace cgra \n{\n\n";
             t_codeFile << "const cgra::TopLevel::assembler_type_t assembler[] = {\n";
 
             uint64_t lvlId{0};
@@ -783,6 +797,9 @@ void Assembler::assemble(void)
                         case as::COMMANDCLASS::LOOP:
                             static_cast<Loop *>(m_firstLevel->at(lvlId++))->assemble(m_config, t_codeFile);
                             break;
+                        case as::COMMANDCLASS::RESETVAR:
+                            static_cast<ResetVariable *>(po)->resetVariable();
+                            break;
                         case as::COMMANDCLASS::CONSTANT:
                         case as::COMMANDCLASS::VARIABLE:
                         default:
@@ -791,6 +808,7 @@ void Assembler::assemble(void)
                 }
 
             t_codeFile << "};\n\n";
+            t_codeFile << "} //End namespace cgra\n\n";
             t_codeFile << "#endif //" << std::uppercase << m_outFileName.stem().string() << "_H_\n";
             t_fb.close();
         }

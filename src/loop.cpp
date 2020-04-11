@@ -20,6 +20,7 @@
 #include "myException.h"
 #include "nooperand.h"
 #include "oneoperand.h"
+#include "resetvariable.h"
 #include "threeoperand.h"
 #include "twooperand.h"
 #include <utility>
@@ -154,6 +155,9 @@ std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ost
                             break;
                         case as::COMMANDCLASS::LOOP:
                             static_cast<Loop *>(this->at(lvlId++))->assemble(ptreeA, osA);
+                            break;
+                        case as::COMMANDCLASS::RESETVAR:
+                            static_cast<ResetVariable *>(po)->resetVariable();
                             break;
                         case as::COMMANDCLASS::CONSTANT:
                         case as::COMMANDCLASS::VARIABLE:
