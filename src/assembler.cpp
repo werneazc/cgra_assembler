@@ -766,8 +766,9 @@ void Assembler::assemble(void)
             t_codeFile << "#ifndef " << std::uppercase << m_outFileName.stem().string() << "_H_\n";
             t_codeFile << "#define " << std::uppercase << m_outFileName.stem().string() << "_H_\n\n\n";
 
+            t_codeFile << "#include <vector>\n\n";
             t_codeFile << "namespace cgra \n{\n\n";
-            t_codeFile << "const cgra::TopLevel::assembler_type_t assembler[] = {\n";
+            t_codeFile << "std::vector<cgra::TopLevel::assembler_type_t> assembly{\n";
 
             uint64_t lvlId{0};
 
@@ -780,19 +781,23 @@ void Assembler::assemble(void)
                             break;
                         case as::COMMANDCLASS::NOOPERAND:
                             t_codeFile << static_cast<as::NoOperand *>(po)->assemble(m_config);
-                            t_codeFile << "," << std::endl;
+                            t_codeFile << ",";
+                            t_codeFile << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::ONEOPERAND:
                             t_codeFile << static_cast<as::OneOperand *>(po)->assemble(m_config);
-                            t_codeFile << "," << std::endl;
+                            t_codeFile << ",";
+                            t_codeFile << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::TWOOPERAND:
                             t_codeFile << static_cast<as::TwoOperand *>(po)->assemble(m_config);
-                            t_codeFile << "," << std::endl;
+                            t_codeFile << ",";
+                            t_codeFile << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::THREEOPERAND:
                             t_codeFile << static_cast<as::ThreeOperand *>(po)->assemble(m_config);
-                            t_codeFile << "," << std::endl;
+                            t_codeFile << ",";
+                            t_codeFile << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::LOOP:
                             static_cast<Loop *>(m_firstLevel->at(lvlId++))->assemble(m_config, t_codeFile);

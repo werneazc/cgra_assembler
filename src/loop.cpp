@@ -139,19 +139,23 @@ std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ost
                             break;
                         case as::COMMANDCLASS::NOOPERAND:
                             osA << static_cast<as::NoOperand *>(po)->assemble(ptreeA);
-                            osA << "," << std::endl;
+                            osA << ",";
+                            osA << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::ONEOPERAND:
                             osA << static_cast<as::OneOperand *>(po)->assemble(ptreeA);
-                            osA << "," << std::endl;
+                            osA << ",";
+                            osA << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::TWOOPERAND:
                             osA << static_cast<as::TwoOperand *>(po)->assemble(ptreeA);
-                            osA << "," << std::endl;
+                            osA << ",";
+                            osA << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::THREEOPERAND:
                             osA << static_cast<as::ThreeOperand *>(po)->assemble(ptreeA);
-                            osA << "," << std::endl;
+                            osA << ",";
+                            osA << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::LOOP:
                             static_cast<Loop *>(this->at(lvlId++))->assemble(ptreeA, osA);
