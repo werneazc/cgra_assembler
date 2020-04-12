@@ -45,7 +45,7 @@ LOADPC pcaddr2 1
 VAR caddr coeff0
 SLCT_DIC_LINE 1
 VAR place 0
-LOOP 0 4 1 
+LOOP 0 5 1 
     LOADD caddr 0 place
     ADDI place 2
     ADD caddr coeffSize
@@ -53,7 +53,7 @@ POOL
 SLCT_DIC_LINE 0
 VAR place 0
 VAR caddr coeff4
-LOOP 0 4 1 
+LOOP 0 5 1 
     LOADD caddr 1 place
     ADDI place 2
     ADD caddr coeffSize
@@ -87,7 +87,7 @@ LOOP 0 pixHeight 1
         #Update filter coefficients
         VAR caddr coeff0
         VAR place 0
-        LOOP 0 4 1 
+        LOOP 0 5 1 
             LOADD caddr 0 place
             ADDI place 2
             ADD caddr coeffSize
@@ -98,7 +98,7 @@ LOOP 0 pixHeight 1
         VAR place 1
         VAR count -1
         #Pix 0 ... Pix 2
-        LOOP 0 3 1
+        LOOP 0 4 1
             VAR temp filterpoint
             SUB temp pixWidth
             ADD temp count
