@@ -273,4 +273,14 @@ Level *Level::at(uint32_t lvlId) const
     return m_childLvlVec.at(lvlId);
 }
 
+bool Level::hasParent() const
+{
+    return m_parentLvl != nullptr;
+}
+
+bool Level::hasChild() const
+{
+    return m_childLvlVec.empty() != false;
+}
+
 } /* End namespace as */

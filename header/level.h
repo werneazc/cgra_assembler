@@ -195,6 +195,12 @@ class Level
     /** @brief Get access to child level instance */
     Level *at(uint32_t lvlId) const;
 
+    /** @brief Return true, if a parent level exists. */
+    bool hasParent() const;
+
+    /** @brief Return true, if any child level exists. */
+    bool hasChild() const;
+
   private:
     // Forbidden constructors
     Level(const Level &src) = delete;
