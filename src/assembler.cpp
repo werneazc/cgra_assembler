@@ -477,8 +477,42 @@ void Assembler::parse(void)
 
                             if (t_var)
                                 {
-                                    t_pvPtr = static_cast<as::ParseObjBase *>(new ResetVariable(
-                                        Level::getCurrentLevel(), t_LineMatch[0].str(), t_count, t_value, t_var));
+                                    auto t_valPtr = Level::getCurrentLevel()->findParseObj(t_LineMatch[2].str());
+
+                                    if (t_valPtr)
+                                        {
+                                            t_pvPtr = static_cast<as::ParseObjBase *>(
+                                                new ResetVariable(Level::getCurrentLevel(), t_LineMatch[0].str(),
+                                                                  t_count, t_valPtr, t_var));
+                                        }
+                                    else
+                                        {
+                                            if (is_number(t_LineMatch[2].str()))
+                                                {
+                                                    t_value = std::stoi(t_LineMatch[2].str(), nullptr, 0);
+
+                                                    auto t_pcPtr = new ParseObjectConst(t_LineMatch[2].str(), t_value,
+                                                                                        Level::getCurrentLevel(),
+                                                                                        t_LineMatch[0].str(), t_count);
+
+                                                    // At parse object to current level
+                                                    Level::getCurrentLevel()->addParseObj(t_pcPtr);
+
+                                                    // Show properties of variable for debugging
+                                                    std::cout << *t_pcPtr << "\n";
+
+                                                    t_pvPtr = static_cast<as::ParseObjBase *>(new ResetVariable(
+                                                        Level::getCurrentLevel(), t_LineMatch[0].str(), t_count,
+                                                        t_pcPtr, t_var));
+                                                }
+                                            else
+                                                {
+                                                    std::ostringstream t_msg{""};
+                                                    t_msg << "Error line" << t_count
+                                                          << ". Variable reset value is invalid." << std::endl;
+                                                    throw AssemblerException(t_msg.str(), 1023);
+                                                }
+                                        }
                                 }
                             else
                                 {

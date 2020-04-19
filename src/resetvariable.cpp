@@ -16,14 +16,15 @@
  */
 
 #include "resetvariable.h"
+#include "parseobjectconst.h"
 #include "parseobjectvariable.h"
 #include <sstream>
 #include <utility>
 
 as::ResetVariable::ResetVariable(as::Level *const lvlA, const std::string &cmdLineA, const uint32_t lineNumberA,
-                                 const int32_t valueA, as::ParseObjBase *const varhandleA)
-    : as::ParseObjBase{lvlA, as::COMMANDCLASS::RESETVAR, cmdLineA, lineNumberA}, m_value(valueA),
-      m_varHandle(varhandleA)
+                                 as::ParseObjBase *const valHandleA, as::ParseObjBase *const varhandleA)
+    : as::ParseObjBase{lvlA, as::COMMANDCLASS::RESETVAR, cmdLineA, lineNumberA}, m_varHandle(varhandleA),
+      m_valHandle(valHandleA)
 {
     return;
 }
@@ -31,13 +32,15 @@ as::ResetVariable::ResetVariable(as::Level *const lvlA, const std::string &cmdLi
 as::ResetVariable::ResetVariable(const as::ResetVariable &srcA)
     : as::ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(), srcA.getFileLineNumber()}
 {
+    this->m_valHandle = srcA.m_valHandle;
+    this->m_varHandle = srcA.m_varHandle;
     return;
 }
 
 as::ResetVariable::ResetVariable(as::ResetVariable &&srcA)
     : as::ParseObjBase{srcA.getLevel(), srcA.getCommandClass(), srcA.getReadCmdLine(), srcA.getFileLineNumber()}
 {
-    this->m_value = srcA.m_value;
+    this->m_valHandle = srcA.m_valHandle;
     this->m_varHandle = srcA.m_varHandle;
     srcA.clearMembers();
 
@@ -47,7 +50,7 @@ as::ResetVariable::ResetVariable(as::ResetVariable &&srcA)
 as::ResetVariable &as::ResetVariable::operator=(as::ResetVariable &&rhsA)
 {
     *(static_cast<ParseObjBase *>(this)) = std::move(static_cast<ParseObjBase &>(rhsA));
-    this->m_value = rhsA.m_value;
+    this->m_valHandle = rhsA.m_valHandle;
     this->m_varHandle = rhsA.m_varHandle;
 
     rhsA.clearMembers();
@@ -58,7 +61,7 @@ as::ResetVariable &as::ResetVariable::operator=(as::ResetVariable &&rhsA)
 as::ResetVariable &as::ResetVariable::operator=(const as::ResetVariable &rhsA)
 {
     *(static_cast<ParseObjBase *>(this)) = static_cast<const ParseObjBase &>(rhsA);
-    this->m_value = rhsA.m_value;
+    this->m_valHandle = rhsA.m_valHandle;
     this->m_varHandle = rhsA.m_varHandle;
 
     return *this;
@@ -67,7 +70,7 @@ as::ResetVariable &as::ResetVariable::operator=(const as::ResetVariable &rhsA)
 void as::ResetVariable::clearMembers(void)
 {
     static_cast<ParseObjBase *const>(this)->clearMembers();
-    m_value = UINT32_MAX;
+    m_valHandle = nullptr;
     m_varHandle = nullptr;
 
     return;
@@ -75,7 +78,20 @@ void as::ResetVariable::clearMembers(void)
 
 void as::ResetVariable::resetVariable()
 {
-    static_cast<as::ParseObjectVariable *>(m_varHandle)->setVariableValue(m_value);
+    if (m_valHandle && m_varHandle)
+        {
+            if (m_valHandle->getCommandClass() == as::COMMANDCLASS::CONSTANT)
+                {
+                    auto t_val = static_cast<as::ParseObjectConst *>(m_valHandle)->getConstValue();
+                    static_cast<as::ParseObjectVariable *>(m_varHandle)->setVariableValue(t_val);
+                }
+            else if (m_valHandle->getCommandClass() == as::COMMANDCLASS::VARIABLE)
+                {
+                    auto t_val = static_cast<as::ParseObjectVariable *>(m_valHandle)->getVariableValue();
+                    static_cast<as::ParseObjectVariable *>(m_varHandle)->setVariableValue(t_val);
+                }
+        }
+
     return;
 }
 

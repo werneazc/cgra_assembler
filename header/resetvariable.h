@@ -46,11 +46,11 @@ class ResetVariable : public ParseObjBase
      * @param lvlA Level where the parse object exists.
      * @param cmdLineA Assembler file line with command.
      * @param lineNumberA Assembler file line number.
-     * @param valueA Reset value for variable
-     * @param varhandleA Handle for variable to control
+     * @param valHandleA Handle for reset value for variable
+     * @param varHandleA Handle for variable to control
      */
-    ResetVariable(Level *const lvlA, const std::string &cmdLineA, const uint32_t lineNumberA, const int32_t valueA,
-                  as::ParseObjBase *const varhandleA);
+    ResetVariable(Level *const lvlA, const std::string &cmdLineA, const uint32_t lineNumberA, as::ParseObjBase *const valHandleA,
+                  as::ParseObjBase *const varHandleA);
 
     /**
      * @brief Copy constructor
@@ -105,7 +105,7 @@ class ResetVariable : public ParseObjBase
     /** @brief Handle to variable to reset */
     as::ParseObjBase *m_varHandle;
     /** @brief New value to set for handled variable */
-    uint32_t m_value;
+    as::ParseObjBase *m_valHandle;
 };
 
 } /* End namespace as */
