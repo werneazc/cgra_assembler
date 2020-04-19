@@ -45,7 +45,7 @@ LOADPC pcaddr2 1
 VAR caddr coeff0
 SLCT_DIC_LINE 1
 VAR place 0
-LOOP 0 5 1 
+LOOP 0 4 1 
     LOADD caddr 0 place
     ADDI place 2
     ADD caddr coeffSize
@@ -53,7 +53,7 @@ POOL
 SLCT_DIC_LINE 0
 VAR place 0
 VAR caddr coeff4
-LOOP 0 5 1 
+LOOP 0 4 1 
     LOADD caddr 1 place
     ADDI place 2
     ADD caddr coeffSize
@@ -61,24 +61,35 @@ POOL
 
 VAR outPixWidth pixWidth
 SUBI outPixWidth 1
+VAR endPixWidth pixWidth
+SUBI endPixWidth 2
 VAR outPixHeight pixHeight
 SUBI outPixHeight 1
+VAR endPixHeight pixWidth
+SUBI endPixHeight 2
 
 VAR startIn pixWidth
 ADDI startIn 1
 
+#variable definition for variables within the loop
 VAR oaddr outputBegin
 VAR rowOutCount 0
 VAR rowOut 0
-
+VAR columnOutCount 0
+VAR columnInCount 1
+VAR filterpoint pixWidth
 VAR rowInputCount 1
+VAR count -1
+VAR temp 0
+VAR outOffset 0
 
-LOOP 0 pixHeight 1
+LOOP 1 endPixHeight 1
     VAR columnOutCount 0
     VAR columnInCount 1
     VAR filterpoint pixWidth
+    MUL filterpoint rowInputCount
 
-    LOOP 0 pixWidth 1
+    LOOP 1 endPixWidth 1
         SLCT_DIC_LINE 1
         SLCT_DOC_LINE 0
         SLCT_CHCC_LINE 0
@@ -87,18 +98,18 @@ LOOP 0 pixHeight 1
         #Update filter coefficients
         VAR caddr coeff0
         VAR place 0
-        LOOP 0 5 1 
+        LOOP 0 4 1 
             LOADD caddr 0 place
             ADDI place 2
             ADD caddr coeffSize
         POOL
 
-        MUL filterpoint rowInputCount
         ADD filterpoint columnInCount
         VAR place 1
         VAR count -1
         #Pix 0 ... Pix 2
-        LOOP 0 4 1
+        VAR temp 0
+        LOOP 0 3 1
             VAR temp filterpoint
             SUB temp pixWidth
             ADD temp count
@@ -127,6 +138,7 @@ LOOP 0 pixHeight 1
         #Pix 5
         VAR temp filterpoint
         ADDI temp 1
+        MUL temp pixelSize
         ADD temp inputBegin
         LOADD temp 1 place
         ADDI place 2
@@ -152,6 +164,7 @@ LOOP 0 pixHeight 1
         VAR temp filterpoint
         ADD temp pixWidth
         ADDI temp 1
+        MUL temp pixelSize
         ADD temp inputBegin
         LOADD temp 0 1
         LOADD temp1 0 2
@@ -165,17 +178,19 @@ LOOP 0 pixHeight 1
         START
         WAIT_READY
 
+        VAR oaddr outputBegin
         VAR outOffset rowOut
         ADD outOffset columnOutCount
         MUL outOffset pixelSize
+        ADD oaddr outOffset
         STORED oaddr 0 2
 
         ADDI columnOutCount 1
         ADDI columnInCount 1
-        ADD oaddr outOffset
     POOL
 
     ADDI rowOutCount 1
+    ADDI rowInputCount 1
     VAR rowOut rowOutCount
     MUL rowOut outPixWidth
 

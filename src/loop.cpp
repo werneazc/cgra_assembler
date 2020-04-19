@@ -128,8 +128,7 @@ std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ost
 
     uint64_t lvlId{0};
 
-    while (updateLoopIndex())
-        {
+    do {
             for (auto po : this->getParseObjList())
                 {
                     switch (po->getCommandClass())
@@ -171,7 +170,7 @@ std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ost
                 }
 
             lvlId = 0;
-        }
+        } while (updateLoopIndex());
 
     return osA;
 }
