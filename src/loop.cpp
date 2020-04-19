@@ -171,6 +171,8 @@ std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ost
 
             lvlId = 0;
         } while (updateLoopIndex());
+    
+    m_currentValue = m_startValue;
 
     return osA;
 }
