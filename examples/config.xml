@@ -4,7 +4,7 @@
 </General>
 
 <VCGRA_Property>
-    <Available_Memory>8192</Available_Memory>
+    <Available_Memory>1048576</Available_Memory>
     <Num_Dic_Lines>2</Num_Dic_Lines>
     <Num_Dic_Places>8</Num_Dic_Places>
     <Num_Doc_Lines>2</Num_Doc_Lines>
