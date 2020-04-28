@@ -30,6 +30,11 @@
 namespace
 {
 
+/**
+ * @brief Helper function to return variable or constant value.
+ *
+ * @param[in] objA  Pointer to parse object.
+ */
 int32_t getValue(const as::ParseObjBase *objA)
 {
 
