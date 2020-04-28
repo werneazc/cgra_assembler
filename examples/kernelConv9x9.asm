@@ -76,7 +76,6 @@ VAR oaddr outputBegin
 VAR rowOutCount 0
 VAR rowOut 0
 VAR columnOutCount 0
-VAR columnInCount 1
 VAR filterpoint pixWidth
 VAR rowInputCount 1
 VAR count -1
@@ -85,7 +84,6 @@ VAR outOffset 0
 
 LOOP 1 endPixHeight 1
     VAR columnOutCount 0
-    VAR columnInCount 1
     VAR filterpoint pixWidth
     MUL filterpoint rowInputCount
 
@@ -104,7 +102,7 @@ LOOP 1 endPixHeight 1
             ADD caddr coeffSize
         POOL
 
-        ADD filterpoint columnInCount
+        ADDI filterpoint 1
         VAR place 1
         VAR count -1
         #Pix 0 ... Pix 2
@@ -186,7 +184,6 @@ LOOP 1 endPixHeight 1
         STORED oaddr 0 2
 
         ADDI columnOutCount 1
-        ADDI columnInCount 1
     POOL
 
     ADDI rowOutCount 1
@@ -196,3 +193,4 @@ LOOP 1 endPixHeight 1
 
 POOL
 FINISH
+
