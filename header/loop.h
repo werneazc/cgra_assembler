@@ -51,8 +51,8 @@ class Loop : public Level
      * @param[in] stepWidthA Stepwidth to adapt Loop index for each iteration.
      * @param[in] readCmdA Source code line of assembler file (human readable).
      */
-    Loop(Level *const parentLvlA, const uint32_t fileLineA, const uint32_t startValueA, const uint32_t endValueA,
-         const int32_t stepWidthA, const std::string readCmdA);
+    Loop(Level *const parentLvlA, const uint32_t fileLineA, ParseObjBase *startValueA, ParseObjBase *endValueA,
+         ParseObjBase *stepWidthA, const std::string readCmdA);
 
     /**
      * @brief Move constructor
@@ -120,11 +120,11 @@ class Loop : public Level
     //!< @brief File line number in assembler file where loop is declared.
     int32_t m_currentValue;
     //!< @brief Current value of loop index.
-    int32_t m_stepWidth;
+    ParseObjBase *m_stepWidth;
     //!< @brief Stepwidth for loop index update.
-    uint32_t m_startValue;
+    ParseObjBase *m_startValue;
     //!< @brief Start value for index loop of range.
-    uint32_t m_endValue;
+    ParseObjBase *m_endValue;
     //!< @brief End value for index loop of range.
 };
 

@@ -363,18 +363,34 @@ void Assembler::parse(void)
                     else if (boost::regex_search(t_str, t_LineMatch, c_eLoop))
                         {
                             // Temporary variables to store loop parameters from parsed command string
-                            int32_t t_start{0};
-                            int32_t t_end{0};
-                            int32_t t_step{0};
+                            ParseObjBase *t_start{0};
+                            ParseObjBase *t_end{0};
+                            ParseObjBase *t_step{0};
                             uint8_t t_countval{1}; // This counter iterates over group matches; 0 is whole match.
 
-                            // Get start, end and step value value for Loop
-                            for (int32_t *const val : {&t_start, &t_end, &t_step})
+                            // Get start, end and step value for Loop
+                            for (auto val : {&t_start, &t_end, &t_step})
                                 {
 
                                     if (is_number(t_LineMatch[t_countval].str()))
                                         {
-                                            *val = std::stoi(t_LineMatch[t_countval].str(), nullptr, 0);
+                                            auto t_searchResult =
+                                                Level::getCurrentLevel()->findParseObj(t_LineMatch[t_countval].str());
+
+                                            if (t_searchResult)
+                                                {
+                                                    *val = t_searchResult;
+                                                }
+                                            else
+                                                {
+                                                    auto t_val = stoi(t_LineMatch[t_countval], nullptr, 0);
+                                                    auto t_pConst = new ParseObjectConst(t_LineMatch[t_countval], t_val,
+                                                                                         Level::getCurrentLevel(),
+                                                                                         t_LineMatch[0], t_count);
+
+                                                    Level::getCurrentLevel()->addParseObj(t_pConst);
+                                                    *val = t_pConst;
+                                                }
                                         }
                                     else
                                         {
@@ -382,13 +398,11 @@ void Assembler::parse(void)
                                                 Level::getCurrentLevel()->findParseObj(t_LineMatch[t_countval].str());
                                             if (t_searchResult)
                                                 {
-                                                    if (t_searchResult->getCommandClass() == COMMANDCLASS::VARIABLE)
-                                                        *val = static_cast<ParseObjectVariable *>(t_searchResult)
-                                                                   ->getVariableValue();
-                                                    else if (t_searchResult->getCommandClass() ==
-                                                             COMMANDCLASS::CONSTANT)
-                                                        *val = static_cast<ParseObjectConst *>(t_searchResult)
-                                                                   ->getConstValue();
+                                                    if (t_searchResult->getCommandClass() == COMMANDCLASS::VARIABLE ||
+                                                        t_searchResult->getCommandClass() == COMMANDCLASS::CONSTANT)
+                                                        {
+                                                            *val = t_searchResult;
+                                                        }
                                                     else
                                                         {
                                                             std::ostringstream t_msg{""};
