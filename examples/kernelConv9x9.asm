@@ -23,13 +23,13 @@ CONST coeff8 0x180
 CONST inputBegin 0x200
 
 #Pixel output region
-CONST outputBegin 0x300
+CONST outputBegin 0x2300
 
 #Constants
 CONST pixelSize 2
 CONST coeffSize 2
-CONST pixWidth 12
-CONST pixHeight 12
+CONST pixWidth 64
+CONST pixHeight 64
 
 #Prepare configuration prefetcher
 SLCT_PECC_LINE 1
@@ -61,33 +61,29 @@ POOL
 
 VAR outPixWidth pixWidth
 SUBI outPixWidth 1
-VAR endPixWidth pixWidth
-SUBI endPixWidth 2
 VAR outPixHeight pixHeight
 SUBI outPixHeight 1
-VAR endPixHeight pixWidth
-SUBI endPixHeight 2
 
 VAR startIn pixWidth
 ADDI startIn 1
 
 #variable definition for variables within the loop
 VAR oaddr outputBegin
-VAR rowOutCount 0
-VAR rowOut 0
-VAR columnOutCount 0
+#VAR rowOutCount 0
+#VAR rowOut 0
+#VAR columnOutCount 0
 VAR filterpoint pixWidth
 VAR rowInputCount 1
 VAR count -1
 VAR temp 0
 VAR outOffset 0
 
-LOOP 1 endPixHeight 1
-    VAR columnOutCount 0
+LOOP 1 outPixHeight 1
+    #VAR columnOutCount 0
     VAR filterpoint pixWidth
     MUL filterpoint rowInputCount
 
-    LOOP 1 endPixWidth 1
+    LOOP 1 outPixWidth 1
         SLCT_DIC_LINE 1
         SLCT_DOC_LINE 0
         SLCT_CHCC_LINE 0
@@ -177,19 +173,20 @@ LOOP 1 endPixHeight 1
         WAIT_READY
 
         VAR oaddr outputBegin
-        VAR outOffset rowOut
-        ADD outOffset columnOutCount
-        MUL outOffset pixelSize
+        #VAR outOffset rowOut
+        #ADD outOffset columnOutCount
+        #MUL outOffset pixelSize
         ADD oaddr outOffset
         STORED oaddr 0 2
 
-        ADDI columnOutCount 1
+        ADDI outOffset pixelSize
+        #ADDI columnOutCount 1
     POOL
 
-    ADDI rowOutCount 1
+    #ADDI rowOutCount 1
     ADDI rowInputCount 1
-    VAR rowOut rowOutCount
-    MUL rowOut outPixWidth
+    #VAR rowOut rowOutCount
+    #MUL rowOut outPixWidth
 
 POOL
 FINISH
