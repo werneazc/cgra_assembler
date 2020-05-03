@@ -355,7 +355,7 @@ void Assembler::parse(void)
 
                     m_log << "Parsed Assembler line " << t_count << ": " << t_str << std::endl;
 
-                    if (t_str.front() == '#' || t_str.empty()) // Comment or empty line
+                    if (t_str.find_first_of('#') != std::string::npos || t_str.empty()) // Comment or empty line
                         {
                             ++t_count;
                             continue;
