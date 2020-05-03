@@ -157,16 +157,24 @@ bool Loop::updateLoopIndex(void)
     if (0 > t_stepwidth) // negative stepwidth
         {
             if (t_endVal >= m_currentValue)
-                return false;
+                {
+                    return false;
+                }
             else
-                return true;
+                {
+                    return true;
+                }
         }
     else
         {
             if (t_endVal <= m_currentValue)
-                return false;
+                {
+                    return false;
+                }
             else
-                return true;
+                {
+                    return true;
+                }
         }
 }
 
