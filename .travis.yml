@@ -1,0 +1,22 @@
+language: cpp
+
+jobs:
+  include:
+    os: linux
+    dist: focal
+    compiler: clang
+    env:
+     - SYSTEMC_ROOT="/tmp/systemc"
+
+    addons:
+      apt:
+        packages:
+          - cmake
+          - doxygen
+          - graphviz
+          - libboost-all-dev
+
+script:
+  - mkdir build
+  - cmake -B build -S ./ -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_STANDARD=14 -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"
+  - cd build && cmake --build ./ --config Release -- -j2
