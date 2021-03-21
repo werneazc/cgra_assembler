@@ -20,27 +20,71 @@
 #include "myException.h"
 #include "nooperand.h"
 #include "oneoperand.h"
+#include "parseobjectconst.h"
+#include "parseobjectvariable.h"
+#include "resetvariable.h"
 #include "threeoperand.h"
 #include "twooperand.h"
 #include <utility>
 
+namespace
+{
+
+/**
+ * @brief Helper function to return variable or constant value.
+ *
+ * @param[in] objA  Pointer to parse object.
+ */
+int32_t getValue(const as::ParseObjBase *objA)
+{
+
+    if (objA->getCommandClass() == as::COMMANDCLASS::CONSTANT)
+        {
+            return static_cast<const as::ParseObjectConst *>(objA)->getConstValue();
+        }
+    else if (objA->getCommandClass() == as::COMMANDCLASS::VARIABLE)
+        {
+            return static_cast<const as::ParseObjectVariable *>(objA)->getVariableValue();
+        }
+    else
+        {
+            throw as::AssemblerException("Error: Invalid type for parse object. It's neither a constant no a variable",
+                                         8019);
+        }
+}
+
+} // end of anonymous namespace
+
 namespace as
 {
 
-Loop::Loop(Level *const parentLvlA, const uint32_t fileLineA, uint32_t startValueA, uint32_t endValueA,
-           int32_t stepwidthA, const std::string readCmdA)
+Loop::Loop(Level *const parentLvlA, const uint32_t fileLineA, ParseObjBase *startValueA, ParseObjBase *endValueA,
+           ParseObjBase *stepwidthA, const std::string readCmdA)
     : Level{parentLvlA}, m_readCommandLine{readCmdA}, m_stepWidth{stepwidthA}, m_fileLine{fileLineA}
 {
-    if (m_stepWidth == 0)
+    int32_t t_stepwidth = getValue(m_stepWidth);
+    int32_t t_startValue = getValue(startValueA);
+    int32_t t_endValue = getValue(endValueA);
+
+    if (t_stepwidth == 0)
         throw AssemblerException("Error: Stepwidth of zero effects endless loop", 8511);
-    else if (m_stepWidth < 0 && startValueA < endValueA)
+    else if (t_stepwidth < 0 && t_startValue < t_endValue)
         throw AssemblerException(
             "Error: Start value smaller then end value by negative stepwidth used for loop conditions.", 8511);
     else
         {
-            m_startValue = startValueA;
-            m_endValue = endValueA;
-            m_currentValue = startValueA;
+            if (t_startValue < t_endValue)
+                {
+                    m_startValue = startValueA;
+                    m_endValue = endValueA;
+                    m_currentValue = t_startValue;
+                }
+            else
+                {
+                    m_startValue = endValueA;
+                    m_endValue = startValueA;
+                    m_currentValue = t_endValue;
+                }
         }
 }
 
@@ -49,15 +93,15 @@ Loop::Loop(Loop &&rhsA) : Level{std::move(rhsA)}
     m_currentValue = rhsA.m_currentValue;
     rhsA.m_currentValue = INT32_MIN;
     m_endValue = rhsA.m_endValue;
-    rhsA.m_endValue = UINT32_MAX;
+    rhsA.m_endValue = nullptr;
     m_fileLine = rhsA.m_fileLine;
     rhsA.m_fileLine = UINT32_MAX;
     m_readCommandLine = rhsA.m_readCommandLine;
     rhsA.m_readCommandLine.clear();
     m_startValue = rhsA.m_startValue;
-    rhsA.m_startValue = UINT32_MAX;
+    rhsA.m_startValue = nullptr;
     m_stepWidth = rhsA.m_stepWidth;
-    rhsA.m_stepWidth = INT32_MIN;
+    rhsA.m_stepWidth = nullptr;
 
     return;
 }
@@ -69,15 +113,15 @@ Loop &Loop::operator=(Loop &&rhsA)
     m_currentValue = rhsA.m_currentValue;
     rhsA.m_currentValue = INT32_MIN;
     m_endValue = rhsA.m_endValue;
-    rhsA.m_endValue = UINT32_MAX;
+    rhsA.m_endValue = nullptr;
     m_fileLine = rhsA.m_fileLine;
     rhsA.m_fileLine = UINT32_MAX;
     m_readCommandLine = rhsA.m_readCommandLine;
     rhsA.m_readCommandLine.clear();
     m_startValue = rhsA.m_startValue;
-    rhsA.m_startValue = UINT32_MAX;
+    rhsA.m_startValue = nullptr;
     m_stepWidth = rhsA.m_stepWidth;
-    rhsA.m_stepWidth = INT32_MIN;
+    rhsA.m_stepWidth = nullptr;
 
     return *this;
 }
@@ -104,21 +148,33 @@ bool operator==(const Loop &lhsA, const Loop &rhsA)
 
 bool Loop::updateLoopIndex(void)
 {
-    m_currentValue += m_stepWidth;
 
-    if (0 > m_stepWidth) // negative stepwidth
+    int32_t t_stepwidth = getValue(m_stepWidth);
+    int32_t t_endVal = getValue(m_endValue);
+
+    m_currentValue += t_stepwidth;
+
+    if (0 > t_stepwidth) // negative stepwidth
         {
-            if (m_endValue >= m_currentValue)
-                return false;
+            if (t_endVal >= m_currentValue)
+                {
+                    return false;
+                }
             else
-                return true;
+                {
+                    return true;
+                }
         }
     else
         {
-            if (m_endValue <= m_currentValue)
-                return false;
+            if (t_endVal <= m_currentValue)
+                {
+                    return false;
+                }
             else
-                return true;
+                {
+                    return true;
+                }
         }
 }
 
@@ -127,7 +183,7 @@ std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ost
 
     uint64_t lvlId{0};
 
-    while (updateLoopIndex())
+    do
         {
             for (auto po : this->getParseObjList())
                 {
@@ -138,22 +194,29 @@ std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ost
                             break;
                         case as::COMMANDCLASS::NOOPERAND:
                             osA << static_cast<as::NoOperand *>(po)->assemble(ptreeA);
-                            osA << "," << std::endl;
+                            osA << ",";
+                            osA << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::ONEOPERAND:
                             osA << static_cast<as::OneOperand *>(po)->assemble(ptreeA);
-                            osA << "," << std::endl;
+                            osA << ",";
+                            osA << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::TWOOPERAND:
                             osA << static_cast<as::TwoOperand *>(po)->assemble(ptreeA);
-                            osA << "," << std::endl;
+                            osA << ",";
+                            osA << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::THREEOPERAND:
                             osA << static_cast<as::ThreeOperand *>(po)->assemble(ptreeA);
-                            osA << "," << std::endl;
+                            osA << ",";
+                            osA << " //" << po->getReadCmdLine() << std::endl;
                             break;
                         case as::COMMANDCLASS::LOOP:
                             static_cast<Loop *>(this->at(lvlId++))->assemble(ptreeA, osA);
+                            break;
+                        case as::COMMANDCLASS::RESETVAR:
+                            static_cast<ResetVariable *>(po)->resetVariable();
                             break;
                         case as::COMMANDCLASS::CONSTANT:
                         case as::COMMANDCLASS::VARIABLE:
@@ -164,6 +227,9 @@ std::ostream &Loop::assemble(const boost::property_tree::ptree &ptreeA, std::ost
 
             lvlId = 0;
         }
+    while (updateLoopIndex());
+
+    m_currentValue = getValue(m_startValue);
 
     return osA;
 }

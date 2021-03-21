@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "add.h"
+#include "subinteger.h"
 #include "myException.h"
 #include "parseobjectconst.h"
 #include "parseobjectvariable.h"
@@ -24,27 +24,29 @@
 
 namespace as
 {
-Add::Add(Level *lvlA, const std::string &cmdLineA, const uint32_t lineNumberA, ParseObjBase *const firstA,
-         ParseObjBase *const secondA)
+
+SubInteger::SubInteger(Level *lvlA, const std::string &cmdLineA, const uint32_t &lineNumberA, ParseObjBase *firstA,
+                       ParseObjBase *secondA)
     : IArithmetic{lvlA, cmdLineA, lineNumberA, firstA, secondA}
 {
     return;
 }
 
-Add::Add(const Add &srcA)
+SubInteger::SubInteger(const SubInteger &srcA)
     : IArithmetic{srcA.getLevel(), srcA.getReadCmdLine(), srcA.getFileLineNumber(), srcA.getFirst(), srcA.getSecond()}
 {
     return;
 }
 
-Add::Add(Add &&srcA)
+SubInteger::SubInteger(SubInteger &&srcA)
     : IArithmetic{srcA.getLevel(), srcA.getReadCmdLine(), srcA.getFileLineNumber(), srcA.getFirst(), srcA.getSecond()}
 {
     srcA.clearMembers();
+
     return;
 }
 
-Add &Add::operator=(const Add &rhsA)
+SubInteger &SubInteger::operator=(const SubInteger &rhsA)
 {
     *(static_cast<ParseObjBase *>(this)) = static_cast<const ParseObjBase &>(rhsA);
     this->setFirst(rhsA.getFirst());
@@ -53,8 +55,9 @@ Add &Add::operator=(const Add &rhsA)
     return *this;
 }
 
-Add &Add::operator=(Add &&rhsA)
+SubInteger &SubInteger::operator=(SubInteger &&rhsA)
 {
+
     *(static_cast<ParseObjBase *>(this)) = std::move(static_cast<ParseObjBase &>(rhsA));
     this->setFirst(rhsA.getFirst());
     this->setSecond(rhsA.getSecond());
@@ -64,7 +67,23 @@ Add &Add::operator=(Add &&rhsA)
     return *this;
 }
 
-void Add::clearMembers(void)
+bool SubInteger::processOperation()
+{
+    auto t_first = dynamic_cast<ParseObjectVariable *const>(this->getFirst());
+    auto t_second = dynamic_cast<ParseObjectConst *const>(this->getSecond());
+
+    if (t_first == nullptr)
+        throw AssemblerException("First argument of SUBI is not a variable.", 8504);
+
+    if (t_second == nullptr)
+        throw AssemblerException("Second argument of SUBI is not a constant.", 8505);
+
+    t_first->setVariableValue(t_first->getVariableValue() - t_second->getConstValue());
+
+    return true;
+}
+
+void SubInteger::clearMembers()
 {
     static_cast<ParseObjBase *>(this)->clearMembers();
     this->setFirst(nullptr);
@@ -73,36 +92,9 @@ void Add::clearMembers(void)
     return;
 }
 
-bool Add::processOperation(void)
-{
-    auto t_first = dynamic_cast<ParseObjectVariable *const>(this->getFirst());
-    auto t_cmdClass = this->getSecond()->getCommandClass();
-
-    if (!t_first)
-        throw AssemblerException("Error Addition: One of the operands is not a variable type", 8525);
-    else
-        {
-            if (t_cmdClass == as::COMMANDCLASS::CONSTANT)
-                {
-                    auto t_second = dynamic_cast<as::ParseObjectConst *const>(this->getSecond());
-                    t_first->setVariableValue(t_first->getVariableValue() + t_second->getConstValue());
-                }
-            else if (t_cmdClass == as::COMMANDCLASS::VARIABLE)
-                {
-                    auto t_second = dynamic_cast<as::ParseObjectVariable *const>(this->getSecond());
-                    t_first->setVariableValue(t_first->getVariableValue() + t_second->getVariableValue());
-                }
-            else
-                {
-                    throw AssemblerException("Error Addition: One of the operands is not a variable type", 8525);
-                }
-        }
-    return true;
-}
-
 } /* End namespace as */
 
-std::ostream &operator<<(std::ostream &osA, const as::Add &opA)
+std::ostream &operator<<(std::ostream &osA, const as::SubInteger &opA)
 {
     osA << static_cast<const as::ParseObjBase &>(opA) << "; ";
 

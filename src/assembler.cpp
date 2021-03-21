@@ -19,11 +19,16 @@
 #include "add.h"
 #include "addinteger.h"
 #include "loop.h"
+#include "mul.h"
+#include "mulinteger.h"
 #include "myException.h"
 #include "nooperand.h"
 #include "oneoperand.h"
 #include "parseobjectconst.h"
 #include "parseobjectvariable.h"
+#include "resetvariable.h"
+#include "sub.h"
+#include "subinteger.h"
 #include "threeoperand.h"
 #include "twooperand.h"
 #include <boost/format.hpp>
@@ -38,9 +43,9 @@
 namespace
 {
 
-const boost::regex c_eVariable("VAR\\s+(\\w+)\\s+(\\w+)\\s*$");
+const boost::regex c_eVariable("VAR\\s+(\\w+)\\s+([+-]?\\w+)\\s*$");
 //!< \brief Regular expression to parse a variable line
-const boost::regex c_eConstant("CONST\\s+(\\w+)\\s+(\\d+)\\s*$");
+const boost::regex c_eConstant("CONST\\s+(\\w+)\\s+(0x[[:xdigit:]]+|[+-]?[[:digit:]]+)\\s*$", boost::regex::extended);
 //!< \brief Regular expression to parse a constant line
 const boost::regex c_eLoop("LOOP\\s+(\\w+)\\s+(\\w+)\\s+(\\w+)\\s*$");
 //!< \brief Regular expression to parse a start line of a loop construct
@@ -64,12 +69,28 @@ const boost::regex c_eThree("\\s*(\\w+)\\s+(\\w+)\\s+(\\w+)\\s+(\\w+)");
 bool is_number(const std::string &strA)
 {
     bool t_status{true};
-    for (auto it = strA.cbegin(); it != strA.cend(); ++it)
+
+    if (strA.find("0x") != std::string::npos)
         {
-            if (!std::isdigit(*it))
+            for (auto it = strA.cbegin() + 2; it != strA.cend(); ++it)
                 {
-                    t_status = false;
-                    break;
+                    if (!std::isxdigit(*it))
+                        {
+                            t_status = false;
+                            break;
+                        }
+                }
+        }
+    else
+        {
+
+            for (auto it = strA.cbegin(); it != strA.cend(); ++it)
+                {
+                    if (!std::isdigit(*it) && *it != '+' && *it != '-')
+                        {
+                            t_status = false;
+                            break;
+                        }
                 }
         }
 
@@ -117,8 +138,9 @@ as::ParseObjBase *createTwoOpParseObj(createTwoOpParseObjParam_t &paramA)
                         }
                     else
                         {
-                            auto t_parseObj = new as::ParseObjectConst(op, std::stoi(op), as::Level::getCurrentLevel(),
-                                                                       paramA.commandMatch[0].str(), paramA.count);
+                            auto t_parseObj =
+                                new as::ParseObjectConst(op, std::stoi(op, nullptr, 0), as::Level::getCurrentLevel(),
+                                                         paramA.commandMatch[0].str(), paramA.count);
                             as::Level::getCurrentLevel()->addParseObj(t_parseObj);
 
                             t_op = t_parseObj;
@@ -169,6 +191,56 @@ as::ParseObjBase *createTwoOpParseObj(createTwoOpParseObjParam_t &paramA)
                             t_msg << "Value error line " << paramA.count
                                   << ". Second Argument for ADDI is not a constant." << std::endl;
                             throw as::AssemblerException(t_msg.str(), 1058);
+                        }
+                }
+            else if (std::strcmp(paramA.command.c_str(), "SUB") == 0)
+                {
+                    t_parseObj =
+                        new as::Sub(as::Level::getCurrentLevel(), paramA.match, paramA.count, t_first, t_second);
+
+                    // Show properties of variable for debugging
+                    std::cout << *static_cast<as::Sub *>(t_parseObj) << "\n";
+                }
+            else if (std::strcmp(paramA.command.c_str(), "SUBI") == 0)
+                {
+                    if (t_second->getCommandClass() == as::COMMANDCLASS::CONSTANT)
+                        {
+                            t_parseObj = new as::SubInteger(as::Level::getCurrentLevel(), paramA.match, paramA.count,
+                                                            t_first, t_second);
+                            // Show properties of variable for debugging
+                            std::cout << *static_cast<as::SubInteger *>(t_parseObj) << "\n";
+                        }
+                    else
+                        {
+                            std::ostringstream t_msg{""};
+                            t_msg << "Value error line " << paramA.count
+                                  << ". Second Argument for SUBI is not a constant." << std::endl;
+                            throw as::AssemblerException(t_msg.str(), 1068);
+                        }
+                }
+            else if (std::strcmp(paramA.command.c_str(), "MUL") == 0)
+                {
+                    t_parseObj =
+                        new as::Mul(as::Level::getCurrentLevel(), paramA.match, paramA.count, t_first, t_second);
+
+                    // Show properties of variable for debugging
+                    std::cout << *static_cast<as::Mul *>(t_parseObj) << "\n";
+                }
+            else if (std::strcmp(paramA.command.c_str(), "MULI") == 0)
+                {
+                    if (t_second->getCommandClass() == as::COMMANDCLASS::CONSTANT)
+                        {
+                            t_parseObj = new as::MulInteger(as::Level::getCurrentLevel(), paramA.match, paramA.count,
+                                                            t_first, t_second);
+                            // Show properties of variable for debugging
+                            std::cout << *static_cast<as::MulInteger *>(t_parseObj) << "\n";
+                        }
+                    else
+                        {
+                            std::ostringstream t_msg{""};
+                            t_msg << "Value error line " << paramA.count
+                                  << ". Second Argument for MULI is not a constant." << std::endl;
+                            throw as::AssemblerException(t_msg.str(), 1075);
                         }
                 }
             else
@@ -283,7 +355,7 @@ void Assembler::parse(void)
 
                     m_log << "Parsed Assembler line " << t_count << ": " << t_str << std::endl;
 
-                    if (t_str.front() == '#' || t_str.empty()) // Comment or empty line
+                    if (t_str.find_first_of('#') != std::string::npos || t_str.empty()) // Comment or empty line
                         {
                             ++t_count;
                             continue;
@@ -291,18 +363,34 @@ void Assembler::parse(void)
                     else if (boost::regex_search(t_str, t_LineMatch, c_eLoop))
                         {
                             // Temporary variables to store loop parameters from parsed command string
-                            int32_t t_start{0};
-                            int32_t t_end{0};
-                            int32_t t_step{0};
+                            ParseObjBase *t_start{0};
+                            ParseObjBase *t_end{0};
+                            ParseObjBase *t_step{0};
                             uint8_t t_countval{1}; // This counter iterates over group matches; 0 is whole match.
 
-                            // Get start, end and step value value for Loop
-                            for (int32_t *const val : {&t_start, &t_end, &t_step})
+                            // Get start, end and step value for Loop
+                            for (auto val : {&t_start, &t_end, &t_step})
                                 {
 
                                     if (is_number(t_LineMatch[t_countval].str()))
                                         {
-                                            *val = std::stoi(t_LineMatch[t_countval].str());
+                                            auto t_searchResult =
+                                                Level::getCurrentLevel()->findParseObj(t_LineMatch[t_countval].str());
+
+                                            if (t_searchResult)
+                                                {
+                                                    *val = t_searchResult;
+                                                }
+                                            else
+                                                {
+                                                    auto t_val = stoi(t_LineMatch[t_countval], nullptr, 0);
+                                                    auto t_pConst = new ParseObjectConst(t_LineMatch[t_countval], t_val,
+                                                                                         Level::getCurrentLevel(),
+                                                                                         t_LineMatch[0], t_count);
+
+                                                    Level::getCurrentLevel()->addParseObj(t_pConst);
+                                                    *val = t_pConst;
+                                                }
                                         }
                                     else
                                         {
@@ -310,13 +398,11 @@ void Assembler::parse(void)
                                                 Level::getCurrentLevel()->findParseObj(t_LineMatch[t_countval].str());
                                             if (t_searchResult)
                                                 {
-                                                    if (t_searchResult->getCommandClass() == COMMANDCLASS::VARIABLE)
-                                                        *val = static_cast<ParseObjectVariable *>(t_searchResult)
-                                                                   ->getVariableValue();
-                                                    else if (t_searchResult->getCommandClass() ==
-                                                             COMMANDCLASS::CONSTANT)
-                                                        *val = static_cast<ParseObjectConst *>(t_searchResult)
-                                                                   ->getConstValue();
+                                                    if (t_searchResult->getCommandClass() == COMMANDCLASS::VARIABLE ||
+                                                        t_searchResult->getCommandClass() == COMMANDCLASS::CONSTANT)
+                                                        {
+                                                            *val = t_searchResult;
+                                                        }
                                                     else
                                                         {
                                                             std::ostringstream t_msg{""};
@@ -330,6 +416,10 @@ void Assembler::parse(void)
 
                                     ++t_countval;
                                 }
+
+                            if (t_step == 0)
+                                throw as::AssemblerException("Infinitive Loop, because stepwidth is set to zero.",
+                                                             1066);
 
                             // Add Loop start point to actual level
                             auto t_pObj = new ParseObjBase(Level::getCurrentLevel(), COMMANDCLASS::LOOP,
@@ -366,7 +456,7 @@ void Assembler::parse(void)
 
                             if (is_number(t_LineMatch[2].str()))
                                 {
-                                    t_value = std::stoi(t_LineMatch[2]);
+                                    t_value = std::stoi(t_LineMatch[2].str(), nullptr, 0);
                                 }
                             else
                                 {
@@ -396,8 +486,54 @@ void Assembler::parse(void)
                                         }
                                 }
 
-                            auto t_pvPtr = new ParseObjectVariable(
-                                t_LineMatch[1].str(), t_value, Level::getCurrentLevel(), t_LineMatch[0].str(), t_count);
+                            auto t_var = as::Level::getCurrentLevel()->findParseObj(t_LineMatch[1].str());
+                            as::ParseObjBase *t_pvPtr{nullptr};
+
+                            if (t_var)
+                                {
+                                    auto t_valPtr = Level::getCurrentLevel()->findParseObj(t_LineMatch[2].str());
+
+                                    if (t_valPtr)
+                                        {
+                                            t_pvPtr = static_cast<as::ParseObjBase *>(
+                                                new ResetVariable(Level::getCurrentLevel(), t_LineMatch[0].str(),
+                                                                  t_count, t_valPtr, t_var));
+                                        }
+                                    else
+                                        {
+                                            if (is_number(t_LineMatch[2].str()))
+                                                {
+                                                    t_value = std::stoi(t_LineMatch[2].str(), nullptr, 0);
+
+                                                    auto t_pcPtr = new ParseObjectConst(t_LineMatch[2].str(), t_value,
+                                                                                        Level::getCurrentLevel(),
+                                                                                        t_LineMatch[0].str(), t_count);
+
+                                                    // At parse object to current level
+                                                    Level::getCurrentLevel()->addParseObj(t_pcPtr);
+
+                                                    // Show properties of variable for debugging
+                                                    std::cout << *t_pcPtr << "\n";
+
+                                                    t_pvPtr = static_cast<as::ParseObjBase *>(new ResetVariable(
+                                                        Level::getCurrentLevel(), t_LineMatch[0].str(), t_count,
+                                                        t_pcPtr, t_var));
+                                                }
+                                            else
+                                                {
+                                                    std::ostringstream t_msg{""};
+                                                    t_msg << "Error line" << t_count
+                                                          << ". Variable reset value is invalid." << std::endl;
+                                                    throw AssemblerException(t_msg.str(), 1023);
+                                                }
+                                        }
+                                }
+                            else
+                                {
+                                    t_pvPtr = static_cast<as::ParseObjBase *>(
+                                        new ParseObjectVariable(t_LineMatch[1].str(), t_value, Level::getCurrentLevel(),
+                                                                t_LineMatch[0].str(), t_count));
+                                }
 
                             // At parse object to current level
                             Level::getCurrentLevel()->addParseObj(t_pvPtr);
@@ -422,7 +558,7 @@ void Assembler::parse(void)
 
                             if (is_number(t_LineMatch[2].str()))
                                 {
-                                    t_value = std::stoi(t_LineMatch[2]);
+                                    t_value = std::stoi(t_LineMatch[2].str(), nullptr, 0);
                                 }
                             else
                                 {
@@ -489,7 +625,7 @@ void Assembler::parse(void)
                                                                     else
                                                                         {
                                                                             auto t_parseObj = new as::ParseObjectConst(
-                                                                                op, std::stoi(op),
+                                                                                op, std::stoi(op, nullptr, 0),
                                                                                 as::Level::getCurrentLevel(),
                                                                                 t_commandMatch[0].str(), t_count);
                                                                             as::Level::getCurrentLevel()->addParseObj(
@@ -601,7 +737,7 @@ void Assembler::parse(void)
                                                             else
                                                                 {
                                                                     auto t_parseObj = new as::ParseObjectConst(
-                                                                        t_value, std::stoi(t_value),
+                                                                        t_value, std::stoi(t_value, nullptr, 0),
                                                                         as::Level::getCurrentLevel(),
                                                                         t_commandMatch[0].str(), t_count);
                                                                     as::Level::getCurrentLevel()->addParseObj(
@@ -668,61 +804,71 @@ void Assembler::assemble(void)
     m_log << "\nStart assembling code" << std::endl;
     m_log << "---------------------" << std::endl;
 
-    //Opening file to store machine code.
+    // Opening file to store machine code.
     std::filebuf t_fb;
 
-    if(t_fb.open(m_outPath.c_str(), std::ios::out))
-    {
-        std::ostream t_codeFile(&t_fb);
+    if (t_fb.open(m_outPath.c_str(), std::ios::out))
+        {
+            std::ostream t_codeFile(&t_fb);
 
-        t_codeFile << "#ifndef " << std::uppercase << m_outFileName.stem().string() << "_H_\n";
-        t_codeFile << "#define " << std::uppercase << m_outFileName.stem().string() << "_H_\n\n\n";
+            t_codeFile << "#ifndef " << std::uppercase << m_outFileName.stem().string() << "_H_\n";
+            t_codeFile << "#define " << std::uppercase << m_outFileName.stem().string() << "_H_\n\n\n";
 
-        t_codeFile << "const cgra::TopLevel::assembler_type_t assembler[] = {\n";
+            t_codeFile << "#include <vector>\n\n";
+            t_codeFile << "namespace cgra \n{\n\n";
+            t_codeFile << "std::vector<cgra::TopLevel::assembler_type_t> assembly{\n";
 
-        uint64_t lvlId{0};
+            uint64_t lvlId{0};
 
-        for (auto po : m_firstLevel->getParseObjList())
-            {
-                switch (po->getCommandClass())
-                    {
-                    case as::COMMANDCLASS::ARITHMETIC:
-                        static_cast<as::IArithmetic *>(po)->processOperation();
-                        break;
-                    case as::COMMANDCLASS::NOOPERAND:
-                        t_codeFile << static_cast<as::NoOperand *>(po)->assemble(m_config);
-                        t_codeFile << "," << std::endl;
-                        break;
-                    case as::COMMANDCLASS::ONEOPERAND:
-                        t_codeFile << static_cast<as::OneOperand *>(po)->assemble(m_config);
-                        t_codeFile << "," << std::endl;
-                        break;
-                    case as::COMMANDCLASS::TWOOPERAND:
-                        t_codeFile << static_cast<as::TwoOperand *>(po)->assemble(m_config);
-                        t_codeFile << "," << std::endl;
-                        break;
-                    case as::COMMANDCLASS::THREEOPERAND:
-                        t_codeFile << static_cast<as::ThreeOperand *>(po)->assemble(m_config);
-                        t_codeFile << "," << std::endl;
-                        break;
-                    case as::COMMANDCLASS::LOOP:
-                        static_cast<Loop *>(m_firstLevel->at(lvlId++))->assemble(m_config, t_codeFile);
-                        break;
-                    case as::COMMANDCLASS::CONSTANT:
-                    case as::COMMANDCLASS::VARIABLE:
-                    default:
-                        break;
-                    }
-            }
+            for (auto po : m_firstLevel->getParseObjList())
+                {
+                    switch (po->getCommandClass())
+                        {
+                        case as::COMMANDCLASS::ARITHMETIC:
+                            static_cast<as::IArithmetic *>(po)->processOperation();
+                            break;
+                        case as::COMMANDCLASS::NOOPERAND:
+                            t_codeFile << static_cast<as::NoOperand *>(po)->assemble(m_config);
+                            t_codeFile << ",";
+                            t_codeFile << " //" << po->getReadCmdLine() << std::endl;
+                            break;
+                        case as::COMMANDCLASS::ONEOPERAND:
+                            t_codeFile << static_cast<as::OneOperand *>(po)->assemble(m_config);
+                            t_codeFile << ",";
+                            t_codeFile << " //" << po->getReadCmdLine() << std::endl;
+                            break;
+                        case as::COMMANDCLASS::TWOOPERAND:
+                            t_codeFile << static_cast<as::TwoOperand *>(po)->assemble(m_config);
+                            t_codeFile << ",";
+                            t_codeFile << " //" << po->getReadCmdLine() << std::endl;
+                            break;
+                        case as::COMMANDCLASS::THREEOPERAND:
+                            t_codeFile << static_cast<as::ThreeOperand *>(po)->assemble(m_config);
+                            t_codeFile << ",";
+                            t_codeFile << " //" << po->getReadCmdLine() << std::endl;
+                            break;
+                        case as::COMMANDCLASS::LOOP:
+                            static_cast<Loop *>(m_firstLevel->at(lvlId++))->assemble(m_config, t_codeFile);
+                            break;
+                        case as::COMMANDCLASS::RESETVAR:
+                            static_cast<ResetVariable *>(po)->resetVariable();
+                            break;
+                        case as::COMMANDCLASS::CONSTANT:
+                        case as::COMMANDCLASS::VARIABLE:
+                        default:
+                            break;
+                        }
+                }
 
-        t_codeFile << "};\n\n";
-        t_codeFile << "#endif //" << std::uppercase << m_outFileName.stem().string() << "_H_\n";
-        t_fb.close();
-    }
+            t_codeFile << "};\n\n";
+            t_codeFile << "} //End namespace cgra\n\n";
+            t_codeFile << "#endif //" << std::uppercase << m_outFileName.stem().string() << "_H_\n";
+            t_fb.close();
+        }
     else
-    {
-        throw AssemblerException("Error while opening output file.", 4500);
-    }
+        {
+            throw AssemblerException("Error while opening output file.", 4500);
+        }
 
     m_log << "Machine operation code successfully stored at " << m_outPath << std::endl;
 

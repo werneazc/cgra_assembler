@@ -61,13 +61,13 @@ int main(int argc, char **argv)
     po::notify(vm);
 
     // If help is within vm, show description.
-    if (vm.count("help"))
+    if (vm.count("help") != 0U)
         {
             std::cout << desc << std::endl;
             return EXIT_SUCCESS;
         }
 
-    if (vm.count("log"))
+    if (vm.count("log") != 0U)
         {
             /* Create file system path variable for log file.*/
             fs::path logPtr{vm["log"].as<std::string>().c_str()};
@@ -75,10 +75,14 @@ int main(int argc, char **argv)
             if (!fs::exists(logPtr))
                 {
                     if (logPtr.parent_path().string() != ".")
-                        fs::create_directories(logPtr.parent_path());
+                        {
+                            fs::create_directories(logPtr.parent_path());
+                        }
                 }
             else
-                std::cout << "Warning: Logfile exists and will be overwritten." << std::endl;
+                {
+                    std::cout << "Warning: Logfile exists and will be overwritten." << std::endl;
+                }
         }
 
     /* Create file system path variable to validate assembler input file.*/
@@ -89,17 +93,20 @@ int main(int argc, char **argv)
             std::cout << "Assembler file is missing" << std::endl;
             return EXIT_FAILURE;
         }
-    else if (!fs::is_regular_file(filePtr))
+
+    if (!fs::is_regular_file(filePtr))
         {
             std::cout << "Path " << filePtr.string() << " is not a regular file." << std::endl;
             return EXIT_FAILURE;
         }
-    else if (filePtr.extension() != ".asm")
+
+    if (filePtr.extension() != ".asm")
         {
             std::cout << "File " << filePtr.filename() << " has wrong file extension." << std::endl;
             return EXIT_FAILURE;
         }
-    else if (fs::is_empty(filePtr))
+
+    if (fs::is_empty(filePtr))
         {
             std::cout << "File " << filePtr.filename() << " is empty." << std::endl;
             return EXIT_FAILURE;
@@ -113,49 +120,50 @@ int main(int argc, char **argv)
             std::cout << "Program configuration file is missing" << std::endl;
             return EXIT_FAILURE;
         }
-    else if (!fs::is_regular_file(configPtr))
+
+    if (!fs::is_regular_file(configPtr))
         {
             std::cout << "Path " << configPtr.string() << " is not a regular file." << std::endl;
             return EXIT_FAILURE;
         }
-    else if (configPtr.extension() != ".xml")
+
+    if (configPtr.extension() != ".xml")
         {
             std::cout << "Configuration file " << configPtr.filename() << " has wrong file extension." << std::endl;
             return EXIT_FAILURE;
         }
-    else if (fs::is_empty(configPtr))
+
+    if (fs::is_empty(configPtr))
         {
             std::cout << "Configuration file " << configPtr.filename() << " is empty." << std::endl;
             return EXIT_FAILURE;
         }
+
+    /*Load configuration file and parse.*/
+    std::filebuf fb;
+    if (fb.open(configPtr.c_str(), std::ios::in) != nullptr)
+        {
+            std::istream is(&fb);
+            pt::read_xml(is, parsed_options);
+            fb.close();
+        }
     else
         {
-            /*Load configuration file and parse.*/
-            std::filebuf fb;
-            if (fb.open(configPtr.c_str(), std::ios::in))
-                {
-                    std::istream is(&fb);
-                    pt::read_xml(is, parsed_options);
-                    fb.close();
-                }
-            else
-                {
-                    std::cout << "Error while loading configuration file." << std::endl;
-                    return EXIT_FAILURE;
-                }
+            std::cout << "Error while loading configuration file." << std::endl;
+            return EXIT_FAILURE;
         }
 
     try
         {
             // Run assembler with log file
-            if (vm.count("log"))
+            if (vm.count("log") != 0U)
                 {
 
                     /* Create file system path variable for log file.*/
                     fs::path logPtr{vm["log"].as<std::string>().c_str()};
 
                     std::filebuf fb;
-                    if (fb.open(logPtr.c_str(), std::ios::out))
+                    if (fb.open(logPtr.c_str(), std::ios::out) != nullptr)
                         {
                             std::ostream log_os(&fb);
                             as::Assembler myAs(filePtr, parsed_options, log_os);

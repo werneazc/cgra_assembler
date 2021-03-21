@@ -29,8 +29,10 @@ add_library(parseobjects
     OBJECT
         src/parseobjbase.cpp src/parseobjectconst.cpp src/parseobjectvariable.cpp
         src/level.cpp src/loop.cpp
-        src/iarithmetic.cpp src/addinteger.cpp src/add.cpp
+        src/iarithmetic.cpp src/addinteger.cpp src/add.cpp src/sub.cpp src/subinteger.cpp
+        src/mul.cpp src/mulinteger.cpp
         src/nooperand.cpp src/oneoperand.cpp src/twooperand.cpp src/threeoperand.cpp
+        src/resetvariable.cpp
     )
 target_include_directories(parseobjects
     PUBLIC
@@ -72,7 +74,7 @@ target_compile_features(assembler
 target_link_libraries(assembler
     PUBLIC
         parseobjects myexceptions
-        Boost::regex Boost::system
+        Boost::regex
     )
 
 #Create assembler executable

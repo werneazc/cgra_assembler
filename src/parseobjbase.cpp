@@ -167,6 +167,10 @@ std::string commandclassToString(as::COMMANDCLASS classA)
             return "two-operand";
         case as::COMMANDCLASS::VARIABLE:
             return "variable";
+        case as::COMMANDCLASS::LOOP:
+            return "begin of loop";
+        case as::COMMANDCLASS::RESETVAR:
+            return "redefinition of variable";
         default:
             return "unknown";
         }

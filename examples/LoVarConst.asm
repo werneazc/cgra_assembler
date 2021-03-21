@@ -1,4 +1,4 @@
-CONST myConst 10
+CONST myConst -10
 VAR myVar 1
 LOOP 0 5 1
     VAR myVar2 myConst
