@@ -74,7 +74,7 @@ target_compile_features(assembler
 target_link_libraries(assembler
     PUBLIC
         parseobjects myexceptions
-        Boost::regex Boost::system
+        Boost::regex
     )
 
 #Create assembler executable
